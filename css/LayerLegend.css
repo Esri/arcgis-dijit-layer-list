@@ -1,5 +1,13 @@
+.LayerLegend{
+    width:280px;
+}
+
 .LayerLegend .esriLegendServiceLabel,.LayerLegend .esriLegendLayerLabel {
 	display:none;
+}
+
+.LayerLegend .esriLegendService{
+    padding-bottom: 0;
 }
 
 .LayerLegend .LL_Title {
@@ -62,7 +70,7 @@
 }
 
 .LayerLegend .LL_Content::-webkit-scrollbar {
-	width:6px;
+	width:10px;
 }
 
 .LayerLegend .LL_Content::-webkit-scrollbar-track {
