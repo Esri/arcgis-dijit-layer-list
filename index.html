@@ -24,13 +24,23 @@
             height: 500px;
             position: relative;
         }
+        #legendContainer{
+            height: 500px;
+            background: #eee;
+            position: absolute;
+            top:10px;
+            right:10px;
+            z-index: 99;
+        }
     </style>
 </head>
 <body class="claro">
     <div class="container">
         <div id="map" class="map">
         </div>
-        <div id="LayerLegend"></div>
+        <div id="legendContainer">
+            <div id="LayerLegend"></div>
+        </div>
     </div>
     <h2>All Options</h2>
     <script type="text/javascript">
