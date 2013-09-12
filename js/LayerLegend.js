@@ -10,8 +10,8 @@ define([
     "dojo/on",
     "dojo/query",
     // load template    
-    "dojo/text!zesri/dijit/templates/LayerLegend.html",
-    "dojo/i18n!zesri/nls/jsapi",
+    "dojo/text!modules/dijit/templates/LayerLegend.html",
+    "dojo/i18n!modules/nls/LayerLegend",
     "dojo/dom-class",
     "dojo/dom-style",
     "dojo/dom-construct",
@@ -112,7 +112,7 @@ function (
                 for(var i = 0; i < layers.length; i++){
                     var layer = layers[i];
                     var firstLayer = '';
-                    if(i == 0){
+                    if(i === 0){
                         firstLayer = ' ' + this._css.firstLayer;
                     }
                     var visible = '';
@@ -138,6 +138,7 @@ function (
                     // Title text
                     var titleText = domConstruct.create("span", {
                         className: this._css.titleText,
+                        title: layer.title,
                         innerHTML: layer.title
                     });
                     domConstruct.place(titleText, titleDiv, "last");
@@ -171,25 +172,28 @@ function (
                 }
             }
         },
-        _toggleLayer: function(i){
+        _toggleLayer: function(index){
+            var map = this.get("map");
             var layers = this.get("layers");
-            var layer = layers[i];
-            console.log(layer);
-            
-            
-            if(layer.featureCollection && layer.featureCollection.layers){
-                var sublayers = layer.featureCollection.layers;
-                for(var i = 0; i < sublayers.length; i++){
-                    var lyr = this.get("map").getLayer(sublayers[i].id);
-                    lyr.setVisibility(!lyr.visible);
+            var layer = layers[index];
+            var lyr;
+            if(layer){
+                if(layer.featureCollection && layer.featureCollection.layers){
+                    var sublayers = layer.featureCollection.layers;
+                    for(var i = 0; i < sublayers.length; i++){
+                        lyr = map.getLayer(sublayers[i].id);
+                        if(map && lyr){
+                            lyr.setVisibility(!lyr.visible);
+                        }
+                    }
+                }
+                else{
+                    lyr = map.getLayer(layer.id);
+                    if(map && lyr){
+                        lyr.setVisibility(!lyr.visible);
+                    }
                 }
             }
-            else{
-                var lyr = this.get("map").getLayer(layer.id);
-                lyr.setVisibility(!lyr.visible);
-            }
-            
-            
         },
         _checkboxEvent: function(checkboxNode, layerNode){
             on(checkboxNode, 'click', lang.hitch(this, function(evt){

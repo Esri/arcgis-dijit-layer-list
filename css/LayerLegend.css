@@ -1,55 +1,83 @@
-.LayerLegend .esriLegendServiceLabel{
-    display: none;
+.LayerLegend .esriLegendServiceLabel,.LayerLegend .esriLegendLayerLabel {
+	display:none;
 }
 
-.LayerLegend .LL_Title{
-    background: #f8f8f8;
-    color:#555555;
-    padding: 10px 6px;
-    border-bottom:1px solid #e0e0e0;
-    border-left:5px solid #cccccc;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 16px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none; 
+.LayerLegend .LL_Title {
+	background:#f8f8f8;
+	color:#555;
+	border-bottom:1px solid #e0e0e0;
+	border-left:5px solid #ccc;
+	cursor:pointer;
+	font-size:16px;
+	line-height:16px;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
 }
 
-.LayerLegend .LL_FirstLayer .LL_Title{
-    border-top:1px solid #e0e0e0;
+.LayerLegend .LL_FirstLayer .LL_Title {
+	border-top:1px solid #e0e0e0;
 }
 
-.LayerLegend .LL_Selected .LL_Title{
-    border-bottom:0;
-    border-left:5px solid #8f499c;
-    background: #fff;
-    color:#8f499c;
+.LayerLegend .LL_Selected .LL_Title {
+	border-bottom:0;
+	border-left:5px solid #8f499c;
+	background:#fff;
+	color:#8f499c;
 }
 
-.LayerLegend .LL_Checkbox{
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background: url(http://png.findicons.com/files/icons/2139/uidesign/16/checkbox_no.png) no-repeat center center;
-    margin-right: 6px;
-    vertical-align: middle;
+.LayerLegend .LL_Text {
+	display:inline-block;
+	padding:10px 0;
+	text-overflow: ellipsis;
+	width: 225px;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
-.LayerLegend .LL_Visible .LL_Checkbox{
-    background: url(http://png.findicons.com/files/icons/2139/uidesign/16/checkbox_yes.png) no-repeat center center;
+.LayerLegend .LL_Checkbox {
+	display:inline-block;
+	width:16px;
+	height:16px;
+	background:url(http://png.findicons.com/files/icons/2139/uidesign/16/checkbox_no.png) no-repeat center center;
+	margin:0;
+	display:inline-block;
+	padding:10px 6px;
+	vertical-align:middle;
 }
 
-.LayerLegend .LL_Content{
-    display: none;
-    background: #6b1978;
-    color:#fff;
-    padding: 10px 10px 10px 15px;
-    max-height: 300px;
-    overflow: auto;
+.LayerLegend .LL_Visible .LL_Checkbox {
+	background:url(http://png.findicons.com/files/icons/2139/uidesign/16/checkbox_yes.png) no-repeat center center;
 }
 
-.LayerLegend .LL_Selected .LL_Content{
-    display: block;
+.LayerLegend .LL_Content {
+	background:#6b1978;
+	color:#fff;
+	max-height:0;
+	_height:0;
+	overflow:auto;
+	-webkit-transition:max-height .25s ease;
+	-moz-transition:max-height .25s ease;
+	transition:max-height .25s ease;
 }
 
+.LayerLegend .LL_Content::-webkit-scrollbar {
+	width:6px;
+}
+
+.LayerLegend .LL_Content::-webkit-scrollbar-track {
+	background-color:#561460;
+}
+
+.LayerLegend .LL_Content::-webkit-scrollbar-thumb {
+	background-color:#8c5296;
+}
+
+.LayerLegend .LL_Selected .LL_Content {
+	max-height:300px;
+	_height:300px;
+}
+
+.LayerLegend .LL_Legend {
+	padding:10px 10px 10px 15px;
+}
