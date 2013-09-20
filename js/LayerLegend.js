@@ -63,8 +63,10 @@ function (
                 firstLayer: "LL_FirstLayer",
                 legend: "LL_Legend",
                 title: "LL_Title",
+                titleContainer: "LL_TitleContainer",
                 content: "LL_Content",
                 titleCheckbox: "LL_Checkbox",
+                checkboxCheck: "icon-check-1",
                 titleText: "LL_Text",
                 selected: "LL_Selected",
                 visible: "LL_Visible"
@@ -113,11 +115,12 @@ function (
                     var layer = layers[i];
                     var firstLayer = '';
                     if(i === 0){
-                        firstLayer = ' ' + this._css.firstLayer;
+                        firstLayer = ' ' + this._css.firstLayer + ' ' + this._css.selected;
                     }
-                    var visible = '';
+                    var visible = '', checked = '';
                     if(layer.visibility){
                         visible = ' ' + this._css.visible;
+                        checked = ' ' + this._css.checkboxCheck;
                     }
                     // layer node
                     var layerDiv = domConstruct.create("div", {
@@ -129,19 +132,24 @@ function (
                         className: this._css.title,
                     });
                     domConstruct.place(titleDiv, layerDiv, "last");
+                    // title container
+                    var titleContainerDiv = domConstruct.create("div", {
+                        className: this._css.titleContainer,
+                    });
+                    domConstruct.place(titleContainerDiv, titleDiv, "last");
                     // Title checkbox
                     var titleCheckbox = domConstruct.create("span", {
-                        className: this._css.titleCheckbox
+                        className: this._css.titleCheckbox + checked
                     });
                     domAttr.set(titleCheckbox, 'data-layer', i);
-                    domConstruct.place(titleCheckbox, titleDiv, "last");
+                    domConstruct.place(titleCheckbox, titleContainerDiv, "last");
                     // Title text
                     var titleText = domConstruct.create("span", {
                         className: this._css.titleText,
                         title: layer.title,
                         innerHTML: layer.title
                     });
-                    domConstruct.place(titleText, titleDiv, "last");
+                    domConstruct.place(titleText, titleContainerDiv, "last");
                     // content of layer
                     var contentDiv = domConstruct.create("div", {
                         className: this._css.content
@@ -198,6 +206,7 @@ function (
         _checkboxEvent: function(checkboxNode, layerNode){
             on(checkboxNode, 'click', lang.hitch(this, function(evt){
                 domClass.toggle(layerNode, this._css.visible);
+                domClass.toggle(checkboxNode, this._css.checkboxCheck);
                 var layer = parseInt(domAttr.get(evt.currentTarget, 'data-layer') , 10);
                 this._toggleLayer(layer);
                 event.stop(evt);
