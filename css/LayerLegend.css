@@ -66,6 +66,7 @@
 	line-height:16px;
 	background-color:#fff;
 	color:#000;
+	cursor:pointer;
 }
 
 .LayerLegend .LL_Checkbox:hover {

@@ -1,5 +1,8 @@
 define({
     root: ({
+        LayerLegend:{
+            noLegend: "No legend"
+        }
     }),
     "ar": 1,
     "da": 1,
