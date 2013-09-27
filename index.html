@@ -60,7 +60,7 @@
     <script src="http://js.arcgis.com/3.6/" type="text/javascript"></script>
     <script type="text/javascript">
         require(["dojo/_base/lang", "esri/map", "modules/LayerLegend", "esri/arcgis/utils"], function(lang, Map, LayerLegend, arcgisUtils){
-            arcgisUtils.createMap('6c0957797ae54eaaa580ba27d1762a89', "map", {
+            arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
                 mapOptions: {
                     //Optionally define additional map config here for example you can 
                     //turn the slider off, display info windows, disable wraparound 180, slider position and more. 
@@ -73,7 +73,8 @@
                 
                 myWidget = new LayerLegend({
                     map: map,
-                    layers: layers
+                    layers: layers,
+                    sublayers: true
                 }, "LayerLegend");
                 myWidget.startup();         
             }), lang.hitch(this, function (error) {

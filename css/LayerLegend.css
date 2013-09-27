@@ -40,9 +40,10 @@
 	color:#8f499c;
 }
 
-.LayerLegend .LL_Text {
+.LayerLegend .LL_Text,.LayerLegend .LL_SublayerText {
 	display:inline-block;
-	margin:12px 0;
+	padding:12px 0;
+	margin:0;
 	text-overflow:ellipsis;
 	width:225px;
 	white-space:nowrap;
@@ -53,7 +54,12 @@
 	vertical-align:middle;
 }
 
-.LayerLegend .LL_Checkbox {
+.LayerLegend .LL_SublayerText {
+	padding:3px 0;
+	width:210px;
+}
+
+.LayerLegend .LL_Checkbox,.LayerLegend .LL_SublayerCheckbox {
 	display:inline-block;
 	height:16px;
 	width:16px;
@@ -69,12 +75,20 @@
 	cursor:pointer;
 }
 
+.LayerLegend .LL_SublayerCheckbox {
+	margin:3px 8px 3px 0;
+}
+
 .LayerLegend .LL_Checkbox:hover {
 	color:#555;
 }
 
 .LayerLegend .LL_Checkbox:active {
 	color:#999;
+}
+
+.LayerLegend .LL_SublayerContainer {
+	margin:10px 0 0 15px;
 }
 
 .LayerLegend .LL_Content {
