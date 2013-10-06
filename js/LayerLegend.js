@@ -43,7 +43,8 @@ function (
             layers: null,
             visible: true,
             sublayers: false,
-            zoomTo: false
+            zoomTo: false,
+            accordion: true
         },
         // lifecycle: 1
         constructor: function(options, srcRefNode) {
@@ -59,6 +60,7 @@ function (
             this.set("visible", this.options.visible);
             this.set("sublayers", this.options.sublayers);
             this.set("zoomTo", this.options.zoomTo);
+            this.set("accordion", this.options.accordion);
             // listeners
             this.watch("theme", this._updateThemeWatch);
             this.watch("visible", this._visible);
@@ -468,10 +470,13 @@ function (
             var titleEvent = on(this._nodes[index].title, 'click', lang.hitch(this, function() {
                 // title is not already selected
                 if (!domClass.contains(this._nodes[index].layer, this._css.selected)) {
-                    // remove all selected 
-                    var nodes = query('.' + this._css.selected, this._layersNode);
-                    for (var i = 0; i < nodes.length; i++) {
-                        domClass.remove(nodes[i], this._css.selected);
+                    // if we want the accordion effect
+                    if(this.get("accordion")){
+                        // remove all selected 
+                        var nodes = query('.' + this._css.selected, this._layersNode);
+                        for (var i = 0; i < nodes.length; i++) {
+                            domClass.remove(nodes[i], this._css.selected);
+                        }
                     }
                 }
                 // toggle selected class
