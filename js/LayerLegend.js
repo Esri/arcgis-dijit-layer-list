@@ -64,7 +64,7 @@ function (
             // listeners
             this.watch("theme", this._updateThemeWatch);
             this.watch("visible", this._visible);
-            this.watch("layers", this.refresh);
+            this.watch("layers", this._refreshLayers);
             this.watch("sublayers", this.refresh);
             this.watch("map", this.refresh);
             this.watch("zoomTo", this.refresh);
@@ -376,6 +376,10 @@ function (
                 }
                 this._setLayerEvents();
             }
+        },
+        _refreshLayers: function(){
+            this._expanded = null;
+            this.refresh();
         },
         _removeEvents: function() {
             var i;
