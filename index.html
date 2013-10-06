@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
     <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css">
     <link rel="stylesheet" type="text/css" href="css/LayerLegend.css">
-    <link rel="stylesheet" type="text/css" href="css/LayerLegend2.css">
     <link rel="stylesheet" href="css/fontello.css">
     <!--[if IE 7]><link rel="stylesheet" href="css/fontello-ie7.css"><![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
@@ -38,6 +37,11 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
+        .change-options{
+            list-style:none;
+            margin:20px;
+            padding:0;
+        }
     </style>
 </head>
 <body class="claro">
@@ -47,8 +51,16 @@
         <div id="legendContainer">
             <div id="LayerLegend"></div>
         </div>
+        <h2>Change Options</h2>
+        <ul class="change-options">
+            <li>Theme: <input id="theme_form" type="text" value="LayerLegend" /></li>
+            <li>Visible: <input id="visible_form" type="checkbox" checked /></li>
+            <li>Sublayers: <input id="sublayers_form" type="checkbox" /></li>
+            <li>Zoom to link: <input id="zoom_form" type="checkbox" /></li>
+            <li>Accordion: <input id="accordion_form" type="checkbox" checked /></li>
+        </ul>
     </div>
-    <h2>All Options</h2>
+    <h2>Documentation</h2>
     <script type="text/javascript">
         var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
         var dojoConfig = {
@@ -62,7 +74,7 @@
     </script>
     <script src="http://js.arcgis.com/3.6/" type="text/javascript"></script>
     <script type="text/javascript">
-        require(["dojo/_base/lang", "esri/map", "modules/LayerLegend", "esri/arcgis/utils"], function(lang, Map, LayerLegend, arcgisUtils){
+        require(["dojo/_base/lang", "esri/map", "modules/LayerLegend", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function(lang, Map, LayerLegend, arcgisUtils, on, dom){
             arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
                 mapOptions: {
                     //Optionally define additional map config here for example you can 
@@ -76,10 +88,32 @@
                 
                 myWidget = new LayerLegend({
                     map: map,
-                    layers: layers,
-                    sublayers: true
+                    layers: layers
                 }, "LayerLegend");
-                myWidget.startup();         
+                myWidget.startup();
+                
+                
+                on(dom.byId('theme_form'), 'keyup', lang.hitch(this, function(evt){
+                    myWidget.set("theme", evt.target.value);
+                }));
+                
+                on(dom.byId('visible_form'), 'change', lang.hitch(this, function(evt){
+                    myWidget.set("visible", evt.target.checked);
+                }));
+                
+                on(dom.byId('sublayers_form'), 'change', lang.hitch(this, function(evt){
+                    myWidget.set("sublayers", evt.target.checked);
+                }));
+                
+                on(dom.byId('zoom_form'), 'change', lang.hitch(this, function(evt){
+                    myWidget.set("zoomTo", evt.target.checked);
+                }));
+                
+                on(dom.byId('accordion_form'), 'change', lang.hitch(this, function(evt){
+                    myWidget.set("accordion", evt.target.checked);
+                }));
+                
+                
             }), lang.hitch(this, function (error) {
                 //an error occurred - notify the user. In this example we pull the string from the 
                 //resource.js file located in the nls folder because we've set the application up 
