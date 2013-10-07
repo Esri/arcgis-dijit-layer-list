@@ -1,32 +1,149 @@
-# arcgis-dijit-home-button-js
+# Layer Legend Widget
 
 ## Features
-A simple dijit button return to the map's default extent when clicked.
+The LayerLegend widget provides a table of contents and legend view that allows the toggling of layer visibility and sublayers. Each layer has its own legend in an accordian view. The style can be completely changed and skinned to match your own map design.
 
-![App](https://raw.github.com/driskull/arcgis-dijit-home-button-js/master/images/demo.png)
-
-[View Demo](http://driskull.github.com/arcgis-dijit-home-button-js/)
-
-## Instructions
-
-Basic use
-
-    var myWidget = new homeButton({
-        map: myMap,
-    }, "homeButton");
+## Quickstart
+	var map = response.map;
+    var layers = response.itemInfo.itemData.operationalLayers;
+  
+    myWidget = new LayerLegend({
+      map: map,
+      layers: layers
+    }, "LayerLegend");
     myWidget.startup();
-    
-All options
-    
-     var myWidget = new homeButton({
-        map: myMap,
-        theme: "homeButton", // use a custom theme to style yourself
-        visible: true // show the button
-    }, "homeButton");
-    myWidget.startup();
-
 
  [New to Github? Get started here.](https://github.com/)
+ 
+## Documentation
+
+### Setup
+Set your dojo config to load the module.
+
+	var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+	var dojoConfig = {
+		// The locationPath logic below may look confusing but all its doing is 
+		// enabling us to load the api from a CDN and load local modules from the correct location.
+		packages: [{
+			name: "modules",
+			location: package_path + '/js'
+		}]
+	};
+
+### Require module
+Include the module for the legend.
+
+	require(["modules/LayerLegend", ... ], function(LayerLegend, ... ){ ... });
+
+### Constructor
+
+LayerLegend(options, srcNode);
+
+#### Options (Object)
+|property|required|type|value|description|
+|---|---|---|---|
+|theme||string|LayerLegend|CSS Class for uniquely styling the widget.|
+|map|x|Map|null|ArcGIS JS Map|
+|layers|x|Array|null|Array of layers|
+|visible||Boolean|true|Show the widget|
+|sublayers||Boolean|false|Show sublayers|
+|zoomTo||Boolean|false|Show zoom to link|
+|accordion||Boolean|true|Hide open legends when another is opened.|
+
+
+
+### Properties
+|property|type|description|
+|---|---|---|
+|theme|string|CSS Class for uniquely styling the widget.|
+|map|Map|ArcGIS JS Map|
+|layers|Array|Array of layers|
+|visible|Boolean|Show the widget|
+|sublayers|Boolean|Show sublayers|
+|zoomTo|Boolean|Show zoom to link|
+|accordion|Boolean|Hide open legends when another is opened.|
+|loaded|Boolean|If the widget has been loaded.|
+
+### Methods
+#### startup
+startup(): Start the widget.
+#### destroy
+destroy(): Destroy the widget.
+#### show
+show(): Show the widget.
+#### hide
+hide(): hide the widget.
+#### refresh
+refresh(): reload all layers and properties that may have changed.
+#### expand
+expand(Integer): Expands the legend to the layer index.
+#### toggle
+toggle(Integer): Expands or collapses the layer index.
+#### collapse
+collapse(Integer): Collapses the layer index.
+
+### Events
+#### load
+##### Example
+	on(widget, 'load', function(evt){…})
+##### Event Object
+	{}
+	
+#### zoom-to
+##### Example
+	on(widget, 'zoom-to', function(evt){…})
+##### Event Object
+	{
+		layer: <Layer>,
+        fullExtent: <Extent>
+        index: <integer>
+	}
+	
+	
+#### toggle
+##### Example
+	on(widget, 'toggle', function(evt){…})
+##### Event Object
+	{
+		expand: <Boolean>,
+        index: <integer>
+	}
+	
+#### expand
+##### Example
+	on(widget, 'expand', function(evt){…})
+##### Event Object
+	{
+        index: <integer>
+	}
+	
+#### collapse
+##### Example
+	on(widget, 'collapse', function(evt){…})
+##### Event Object	
+	{
+        index: <integer>
+	}
+
+### CSS Classes
+	LL_Container
+	LL_Layer
+	LL_FirstLayer
+	LL_Legend
+	LL_Title
+	LL_TitleContainer
+	LL_Content
+	LL_Checkbox
+	icon-check-1
+	LL_Text
+	LL_Expanded
+	LL_Visible
+	LL_ZoomTo
+	LL_SublayerContainer
+	LL_Sublayer
+	LL_SublayerVisible
+	LL_SublayerCheckbox
+	LL_SublayerText
 
 ## Requirements
 
@@ -65,5 +182,5 @@ limitations under the License.
 
 A copy of the license is available in the repository's [license.txt](https://raw.github.com/Esri/geocoder-search-widget-js/master/license.txt) file.
 
-[](Esri Tags: ArcGIS JavaScript API Dijit module swipe Widget Public swipemap LayerSwipe)
+[](Esri Tags: ArcGIS JavaScript API Layer Legend TOC Table of Contents Public)
 [](Esri Language: JavaScript)
