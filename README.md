@@ -3,6 +3,10 @@
 ## Features
 The LayerLegend widget provides a table of contents and legend view that allows the toggling of layer visibility and sublayers. Each layer has its own legend in an accordian view. The style can be completely changed and skinned to match your own map design.
 
+[View it live](http://driskull.github.io/arcgis-dijit-layer-legend-js/)
+
+[![App](https://raw.github.com/driskull/arcgis-dijit-layer-legend-js/master/images/LayerLegend.png)](http://driskull.github.io/arcgis-dijit-layer-legend-js/)
+
 ## Quickstart
 	var map = response.map;
     var layers = response.itemInfo.itemData.operationalLayers;
@@ -50,6 +54,18 @@ LayerLegend(options, srcNode);
 |zoomTo||Boolean|false|Show zoom to link|
 |accordion||Boolean|true|Hide open legends when another is opened.|
 
+##### Layers Object
+This is what the layers array should look like. It follows the response from a webmap's operational layers.
+    [
+        {
+            layer: LayerObject
+            defaultSymbol: Symbol
+            title: String
+        },
+        {
+            ...
+        }
+    ]
 
 
 ### Properties
