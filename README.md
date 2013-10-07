@@ -41,7 +41,7 @@ LayerLegend(options, srcNode);
 
 #### Options (Object)
 |property|required|type|value|description|
-|---|---|---|---|
+|---|---|---|---|---|
 |theme||string|LayerLegend|CSS Class for uniquely styling the widget.|
 |map|x|Map|null|ArcGIS JS Map|
 |layers|x|Array|null|Array of layers|
