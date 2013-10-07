@@ -56,16 +56,17 @@ LayerLegend(options, srcNode);
 
 ##### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
-    [
-        {
-            layer: LayerObject
-            defaultSymbol: Symbol
-            title: String
-        },
-        {
-            ...
-        }
-    ]
+
+	layers = [
+    	{
+     	   layer: LayerObject
+    	    defaultSymbol: Symbol
+    	    title: String
+    	},
+    	{
+    		...
+    	}
+	];
 
 
 ### Properties
