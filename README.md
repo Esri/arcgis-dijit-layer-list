@@ -19,9 +19,8 @@ The LayerLegend widget provides a table of contents and legend view that allows 
 
  [New to Github? Get started here.](https://github.com/)
  
-## Documentation
 
-### Setup
+## Setup
 Set your dojo config to load the module.
 
 	var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
@@ -34,16 +33,16 @@ Set your dojo config to load the module.
 		}]
 	};
 
-### Require module
+## Require module
 Include the module for the legend.
 
 	require(["modules/LayerLegend", ... ], function(LayerLegend, ... ){ ... });
 
-### Constructor
+## Constructor
 
 LayerLegend(options, srcNode);
 
-#### Options (Object)
+### Options (Object)
 |property|required|type|value|description|
 |---|---|---|---|---|
 |theme||string|LayerLegend|CSS Class for uniquely styling the widget.|
@@ -54,7 +53,7 @@ LayerLegend(options, srcNode);
 |zoomTo||Boolean|false|Show zoom to link|
 |accordion||Boolean|true|Hide open legends when another is opened.|
 
-##### Layers Object
+#### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
 
 	layers = [
@@ -69,7 +68,7 @@ This is what the layers array should look like. It follows the response from a w
 	];
 
 
-### Properties
+## Properties
 |property|type|description|
 |---|---|---|
 |theme|string|CSS Class for uniquely styling the widget.|
@@ -81,35 +80,35 @@ This is what the layers array should look like. It follows the response from a w
 |accordion|Boolean|Hide open legends when another is opened.|
 |loaded|Boolean|If the widget has been loaded.|
 
-### Methods
-#### startup
+## Methods
+### startup
 startup(): Start the widget.
-#### destroy
+### destroy
 destroy(): Destroy the widget.
-#### show
+### show
 show(): Show the widget.
-#### hide
+### hide
 hide(): hide the widget.
-#### refresh
+### refresh
 refresh(): reload all layers and properties that may have changed.
-#### expand
+### expand
 expand(Integer): Expands the legend to the layer index.
-#### toggle
+### toggle
 toggle(Integer): Expands or collapses the layer index.
-#### collapse
+### collapse
 collapse(Integer): Collapses the layer index.
 
-### Events
-#### load
-##### Example
+## Events
+### load
+#### Example
 	on(widget, 'load', function(evt){…})
-##### Event Object
+#### Event Object
 	{}
 	
-#### zoom-to
-##### Example
+### zoom-to
+#### Example
 	on(widget, 'zoom-to', function(evt){…})
-##### Event Object
+#### Event Object
 	{
 		layer: <Layer>,
         fullExtent: <Extent>
@@ -117,32 +116,32 @@ collapse(Integer): Collapses the layer index.
 	}
 	
 	
-#### toggle
-##### Example
+### toggle
+#### Example
 	on(widget, 'toggle', function(evt){…})
-##### Event Object
+#### Event Object
 	{
 		expand: <Boolean>,
         index: <integer>
 	}
 	
-#### expand
-##### Example
+### expand
+#### Example
 	on(widget, 'expand', function(evt){…})
-##### Event Object
+#### Event Object
 	{
         index: <integer>
 	}
 	
-#### collapse
-##### Example
+### collapse
+#### Example
 	on(widget, 'collapse', function(evt){…})
-##### Event Object	
+#### Event Object	
 	{
         index: <integer>
 	}
 
-### CSS Classes
+## CSS Classes
 	LL_Container
 	LL_Layer
 	LL_FirstLayer
