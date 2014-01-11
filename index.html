@@ -6,7 +6,7 @@
     <title>Layer Legend Dijit</title>
     <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
     <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css">
-    <link rel="stylesheet" type="text/css" href="css/LayerLegend.css">
+    <link rel="stylesheet" type="text/css" href="css/TableOfContents.css">
     <link rel="stylesheet" href="css/fontello.css">
     <!--[if IE 7]><link rel="stylesheet" href="css/fontello-ie7.css"><![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
@@ -49,11 +49,11 @@
         <div id="map" class="map">
         </div>
         <div id="legendContainer">
-            <div id="LayerLegend"></div>
+            <div id="TableOfContents"></div>
         </div>
         <h2>Change Options</h2>
         <ul class="change-options">
-            <li>Theme: <input id="theme_form" type="text" value="LayerLegend" /></li>
+            <li>Theme: <input id="theme_form" type="text" value="TableOfContents" /></li>
             <li>Visible: <input id="visible_form" type="checkbox" checked /></li>
             <li>Sublayers: <input id="sublayers_form" type="checkbox" /></li>
             <li>Zoom to link: <input id="zoom_form" type="checkbox" /></li>
@@ -74,7 +74,7 @@
     </script>
     <script src="http://js.arcgis.com/3.6/" type="text/javascript"></script>
     <script type="text/javascript">
-        require(["dojo/_base/lang", "esri/map", "modules/LayerLegend", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function(lang, Map, LayerLegend, arcgisUtils, on, dom){
+        require(["dojo/_base/lang", "esri/map", "modules/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function(lang, Map, TableOfContents, arcgisUtils, on, dom){
             arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
                 mapOptions: {
                     //Optionally define additional map config here for example you can 
@@ -86,10 +86,10 @@
                 
                 console.log(layers);
                 
-                myWidget = new LayerLegend({
+                myWidget = new TableOfContents({
                     map: map,
                     layers: layers
-                }, "LayerLegend");
+                }, "TableOfContents");
                 myWidget.startup();
                 
                 

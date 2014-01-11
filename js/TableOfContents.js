@@ -9,8 +9,8 @@ define([
     "dojo/on",
     "dojo/query",
     // load template    
-    "dojo/text!modules/dijit/templates/LayerLegend.html",
-    "dojo/i18n!modules/nls/LayerLegend",
+    "dojo/text!modules/dijit/templates/TableOfContents.html",
+    "dojo/i18n!modules/nls/TableOfContents",
     "dojo/dom-class",
     "dojo/dom-style",
     "dojo/dom-construct",
@@ -33,17 +33,18 @@ function (
     array
 ) {
     var Widget = declare([_WidgetBase, _TemplatedMixin, Evented], {
-        declaredClass: "esri.dijit.LayerLegend",
+        declaredClass: "esri.dijit.TableOfContents",
         templateString: dijitTemplate,
         // defaults
         options: {
-            theme: "LayerLegend",
+            theme: "TableOfContents",
             map: null,
             layers: null,
             visible: true,
             sublayers: false,
             zoomTo: false,
-            accordion: true
+            accordion: true,
+            expandFirstItem: false
         },
         // lifecycle: 1
         constructor: function(options, srcRefNode) {
@@ -60,6 +61,7 @@ function (
             this.set("sublayers", defaults.sublayers);
             this.set("zoomTo", defaults.zoomTo);
             this.set("accordion", defaults.accordion);
+            this.set("expandFirstItem", defaults.expandFirstItem);
             // listeners
             this.watch("theme", this._updateThemeWatch);
             this.watch("visible", this._visible);
@@ -69,24 +71,25 @@ function (
             this.watch("zoomTo", this.refresh);
             // classes
             this.css = {
-                container: "LL_Container",
-                layer: "LL_Layer",
-                firstLayer: "LL_FirstLayer",
-                legend: "LL_Legend",
-                title: "LL_Title",
-                titleContainer: "LL_TitleContainer",
-                content: "LL_Content",
-                titleCheckbox: "LL_Checkbox",
+                container: "toc-container",
+                layer: "toc-layer",
+                firstLayer: "toc-first-layer",
+                legend: "toc-legend",
+                title: "toc-title",
+                titleContainer: "toc-title-container",
+                content: "toc-content",
+                titleCheckbox: "toc-checkbox",
                 checkboxCheck: "icon-check-1",
-                titleText: "LL_Text",
-                expanded: "LL_Expanded",
-                visible: "LL_Visible",
-                zoomTo: "LL_ZoomTo",
-                sublayerContainer: "LL_SublayerContainer",
-                sublayer: "LL_Sublayer",
-                sublayerVisible: "LL_SublayerVisible",
-                sublayerCheckbox: "LL_SublayerCheckbox",
-                sublayerText: "LL_SublayerText"
+                titleText: "toc-text",
+                expanded: "toc-expanded",
+                visible: "toc-visible",
+                zoomTo: "toc-zoom-to",
+                sublayerContainer: "toc-sublayer-container",
+                sublayer: "toc-Sublayer",
+                sublayerVisible: "toc-sublayer-visible",
+                sublayerCheckbox: "toc-sublayer-checkbox",
+                sublayerText: "toc-sublayer-text",
+                settingsIcon: "icon-cog"
             };
         },
         // start widget. called by user
@@ -94,7 +97,7 @@ function (
             // map not defined
             if (!this.map) {
                 this.destroy();
-                console.log('LayerLegend::map required');
+                console.log('TableOfContents::map required');
             }
             // when map is loaded
             if (this.map.loaded) {
@@ -196,9 +199,11 @@ function (
             this._removeEvents();
             // clear node
             this._layersNode.innerHTML = '';
-            // Set default expanded to last index
-            if(!this._expanded){
-                this._expanded = [layers.length - 1];
+            if(this.get("expandFirstItem")){
+                // Set default expanded to last index
+                if(!this._expanded){
+                    this._expanded = [layers.length - 1];
+                }
             }
             // if we got layers
             if (layers && layers.length) {
@@ -258,6 +263,15 @@ function (
                         innerHTML: layer.title
                     });
                     domConstruct.place(titleText, titleContainerDiv, "last");
+                    // settings icon
+                    var settingsIcon;
+                    if(layer.settingsIcon){
+                        settingsIcon = domConstruct.create("span", {
+                            className: this.css.settingsIcon,
+                            id: layer.settingsIconId
+                        });
+                        domConstruct.place(settingsIcon, titleText, "last");
+                    }
                     // content of layer
                     var contentDiv = domConstruct.create("div", {
                         className: this.css.content
@@ -316,7 +330,7 @@ function (
                         // legend
                         fullExtentDiv = domConstruct.create("div", {
                             className: this.css.zoomTo,
-                            innerHTML: this._i18n.LayerLegend.zoomTo
+                            innerHTML: this._i18n.TableOfContents.zoomTo
                         });
                         domConstruct.place(fullExtentDiv, contentDiv, "first");
                     }
@@ -350,7 +364,7 @@ function (
                         this._legends.push(legend);
                     } else {
                         // no legend to create
-                        legendDiv.innerHTML = this._i18n.LayerLegend.noLegend;
+                        legendDiv.innerHTML = this._i18n.TableOfContents.noLegend;
                     }
                     // lets save all the nodes for events
                     var nodesObj = {
@@ -359,6 +373,7 @@ function (
                         title: titleDiv,
                         titleContainer: titleContainerDiv,
                         titleText: titleText,
+                        settingsIcon: settingsIcon,
                         content: contentDiv,
                         legend: legendDiv,
                         layer: layerDiv,
@@ -574,7 +589,7 @@ function (
         }
     });
     if (has("extend-esri")) {
-        lang.setObject("dijit.LayerLegend", Widget, esriNS);
+        lang.setObject("dijit.TableOfContents", Widget, esriNS);
     }
     return Widget;
 });
