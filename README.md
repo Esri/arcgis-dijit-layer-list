@@ -5,8 +5,6 @@ The TableOfContents widget provides a table of contents that allows the toggling
 
 [View it live](http://driskull.github.io/arcgis-dijit-table-of-contents/)
 
-[![App](https://raw.github.com/driskull/arcgis-dijit-table-of-contents/master/images/TableOfContents.png)](http://driskull.github.io/arcgis-dijit-table-of-contents/)
-
 ## Quickstart
 	var map = response.map;
     var layers = response.itemInfo.itemData.operationalLayers;
