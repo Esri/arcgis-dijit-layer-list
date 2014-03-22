@@ -1,20 +1,20 @@
-# Layer Legend Widget
+# TOC Widget
 
 ## Features
-The LayerLegend widget provides a table of contents and legend view that allows the toggling of layer visibility and sublayers. Each layer has its own legend in an accordian view. The style can be completely changed and skinned to match your own map design.
+The TableOfContents widget provides a table of contents that allows the toggling of layer visibility and sublayers.  The style can be completely changed and skinned to match your own map design.
 
-[View it live](http://driskull.github.io/arcgis-dijit-layer-legend-js/)
+[View it live](http://driskull.github.io/arcgis-dijit-table-of-contents/)
 
-[![App](https://raw.github.com/driskull/arcgis-dijit-layer-legend-js/master/images/LayerLegend.png)](http://driskull.github.io/arcgis-dijit-layer-legend-js/)
+[![App](https://raw.github.com/driskull/arcgis-dijit-table-of-contents/master/images/TableOfContents.png)](http://driskull.github.io/arcgis-dijit-table-of-contents/)
 
 ## Quickstart
 	var map = response.map;
     var layers = response.itemInfo.itemData.operationalLayers;
   
-    myWidget = new LayerLegend({
+    myWidget = new TableOfContents({
       map: map,
       layers: layers
-    }, "LayerLegend");
+    }, "TableOfContents");
     myWidget.startup();
 
  [New to Github? Get started here.](https://github.com/)
@@ -28,30 +28,27 @@ Set your dojo config to load the module.
 		// The locationPath logic below may look confusing but all its doing is 
 		// enabling us to load the api from a CDN and load local modules from the correct location.
 		packages: [{
-			name: "modules",
+			name: "application",
 			location: package_path + '/js'
 		}]
 	};
 
 ## Require module
-Include the module for the legend.
+Include the module for the TOC.
 
-	require(["modules/LayerLegend", ... ], function(LayerLegend, ... ){ ... });
+	require(["application/TableOfContents", ... ], function(TableOfContents, ... ){ ... });
 
 ## Constructor
 
-LayerLegend(options, srcNode);
+TableOfContents(options, srcNode);
 
 ### Options (Object)
 |property|required|type|value|description|
 |---|---|---|---|---|
-|theme||string|LayerLegend|CSS Class for uniquely styling the widget.|
+|theme||string|TableOfContents|CSS Class for uniquely styling the widget.|
 |map|x|Map|null|ArcGIS JS Map|
 |layers|x|Array|null|Array of layers|
 |visible||Boolean|true|Show the widget|
-|sublayers||Boolean|false|Show sublayers|
-|zoomTo||Boolean|false|Show zoom to link|
-|accordion||Boolean|true|Hide open legends when another is opened.|
 
 #### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
@@ -75,9 +72,6 @@ This is what the layers array should look like. It follows the response from a w
 |map|Map|ArcGIS JS Map|
 |layers|Array|Array of layers|
 |visible|Boolean|Show the widget|
-|sublayers|Boolean|Show sublayers|
-|zoomTo|Boolean|Show zoom to link|
-|accordion|Boolean|Hide open legends when another is opened.|
 |loaded|Boolean|If the widget has been loaded.|
 
 ## Methods
@@ -91,12 +85,6 @@ show(): Show the widget.
 hide(): hide the widget.
 ### refresh
 refresh(): reload all layers and properties that may have changed.
-### expand
-expand(Integer): Expands the legend to the layer index.
-### toggle
-toggle(Integer): Expands or collapses the layer index.
-### collapse
-collapse(Integer): Collapses the layer index.
 
 ## Events
 ### load
@@ -104,16 +92,6 @@ collapse(Integer): Collapses the layer index.
 	on(widget, 'load', function(evt){…})
 #### Event Object
 	{}
-	
-### zoom-to
-#### Example
-	on(widget, 'zoom-to', function(evt){…})
-#### Event Object
-	{
-		layer: <Layer>,
-        fullExtent: <Extent>
-        index: <integer>
-	}
 	
 	
 ### toggle
@@ -125,41 +103,7 @@ collapse(Integer): Collapses the layer index.
         index: <integer>
 	}
 	
-### expand
-#### Example
-	on(widget, 'expand', function(evt){…})
-#### Event Object
-	{
-        index: <integer>
-	}
-	
-### collapse
-#### Example
-	on(widget, 'collapse', function(evt){…})
-#### Event Object	
-	{
-        index: <integer>
-	}
 
-## CSS Classes
-	LL_Container
-	LL_Layer
-	LL_FirstLayer
-	LL_Legend
-	LL_Title
-	LL_TitleContainer
-	LL_Content
-	LL_Checkbox
-	icon-check-1
-	LL_Text
-	LL_Expanded
-	LL_Visible
-	LL_ZoomTo
-	LL_SublayerContainer
-	LL_Sublayer
-	LL_SublayerVisible
-	LL_SublayerCheckbox
-	LL_SublayerText
 
 ## Requirements
 
@@ -198,5 +142,5 @@ limitations under the License.
 
 A copy of the license is available in the repository's [license.txt](https://raw.github.com/Esri/geocoder-search-widget-js/master/license.txt) file.
 
-[](Esri Tags: ArcGIS JavaScript API Layer Legend TOC Table of Contents Public)
+[](Esri Tags: ArcGIS JavaScript API Layer TOC Table of Contents Public)
 [](Esri Language: JavaScript)

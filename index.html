@@ -55,9 +55,6 @@
         <ul class="change-options">
             <li>Theme: <input id="theme_form" type="text" value="TableOfContents" /></li>
             <li>Visible: <input id="visible_form" type="checkbox" checked /></li>
-            <li>Sublayers: <input id="sublayers_form" type="checkbox" /></li>
-            <li>Zoom to link: <input id="zoom_form" type="checkbox" /></li>
-            <li>Accordion: <input id="accordion_form" type="checkbox" checked /></li>
         </ul>
         <p><a href="https://github.com/driskull/arcgis-dijit-layer-legend-js">Documentation & Download</a></p>
     </div>
@@ -67,14 +64,14 @@
             // The locationPath logic below may look confusing but all its doing is 
             // enabling us to load the api from a CDN and load local modules from the correct location.
             packages: [{
-                name: "modules",
+                name: "application",
                 location: package_path + '/js'
             }]
         };
     </script>
     <script src="http://js.arcgis.com/3.6/" type="text/javascript"></script>
     <script type="text/javascript">
-        require(["dojo/_base/lang", "esri/map", "modules/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function(lang, Map, TableOfContents, arcgisUtils, on, dom){
+        require(["dojo/_base/lang", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function(lang, Map, TableOfContents, arcgisUtils, on, dom){
             arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
                 mapOptions: {
                     //Optionally define additional map config here for example you can 
@@ -101,17 +98,7 @@
                     myWidget.set("visible", evt.target.checked);
                 }));
                 
-                on(dom.byId('sublayers_form'), 'change', lang.hitch(this, function(evt){
-                    myWidget.set("sublayers", evt.target.checked);
-                }));
-                
-                on(dom.byId('zoom_form'), 'change', lang.hitch(this, function(evt){
-                    myWidget.set("zoomTo", evt.target.checked);
-                }));
-                
-                on(dom.byId('accordion_form'), 'change', lang.hitch(this, function(evt){
-                    myWidget.set("accordion", evt.target.checked);
-                }));
+             
                 
                 
             }), lang.hitch(this, function (error) {
