@@ -3,7 +3,7 @@
 ## Features
 The TableOfContents widget provides a table of contents that allows the toggling of layer visibility and sublayers.  The style can be completely changed and skinned to match your own map design.
 
-[View it live](http://driskull.github.io/arcgis-dijit-table-of-contents/)
+[View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
 
 ## Quickstart
 	var map = response.map;
