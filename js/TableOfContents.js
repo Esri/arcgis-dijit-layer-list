@@ -8,7 +8,7 @@ define([
     "dijit/_TemplatedMixin",
     "dojo/on",
     // load template    
-    "dojo/text!application/dijit/templates/TableOfContents.html",
+    "dojo/text!./dijit/templates/TableOfContents.html",
     "dojo/dom-class",
     "dojo/dom-style",
     "dojo/dom-construct",
@@ -239,6 +239,10 @@ function (
             // update checkbox and layer visibility classes
             domClass.toggle(this._nodes[index].layer, this.css.visible, visible);
             domClass.toggle(this._nodes[index].checkbox, this.css.checkboxCheck, visible);
+            this.emit("toggle", {
+                index: index,
+                visible: visible
+            });
         },
         _layerEvent: function(layer, index) {
             // layer visibility changes
