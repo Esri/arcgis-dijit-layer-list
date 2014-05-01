@@ -27,8 +27,7 @@ function (
     event,
     array
 ) {
-    var Widget = declare([_WidgetBase, _TemplatedMixin, Evented], {
-        declaredClass: "esri.dijit.TableOfContents",
+    var Widget = declare("esri.dijit.TableOfContents", [_WidgetBase, _TemplatedMixin, Evented], {
         templateString: dijitTemplate,
         // defaults
         options: {
