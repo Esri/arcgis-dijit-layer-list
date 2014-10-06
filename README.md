@@ -1,14 +1,16 @@
 # TOC Widget
 
 ## Features
-The TableOfContents widget provides a table of contents that allows the toggling of layer visibility and sublayers.  The style can be completely changed and skinned to match your own map design.
+The TableOfContents widget provides a table of contents that allows the toggling of layer visibility.  The style can be completely changed and skinned to match your own map design.
+
+This widget does not support toggling individual sublayers (i.e. `visibleLayers` of dynamic map service).
 
 [View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
 
 ## Quickstart
 	var map = response.map;
     var layers = response.itemInfo.itemData.operationalLayers;
-  
+
     myWidget = new TableOfContents({
       map: map,
       layers: layers
@@ -16,14 +18,14 @@ The TableOfContents widget provides a table of contents that allows the toggling
     myWidget.startup();
 
  [New to Github? Get started here.](https://github.com/)
- 
+
 
 ## Setup
 Set your dojo config to load the module.
 
 	var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
 	var dojoConfig = {
-		// The locationPath logic below may look confusing but all its doing is 
+		// The locationPath logic below may look confusing but all its doing is
 		// enabling us to load the api from a CDN and load local modules from the correct location.
 		packages: [{
 			name: "application",
@@ -90,8 +92,8 @@ refresh(): reload all layers and properties that may have changed.
 	on(widget, 'load', function(evt){…})
 #### Event Object
 	{}
-	
-	
+
+
 ### toggle
 #### Example
 	on(widget, 'toggle', function(evt){…})
@@ -100,7 +102,7 @@ refresh(): reload all layers and properties that may have changed.
 		expand: <Boolean>,
         index: <integer>
 	}
-	
+
 
 
 ## Requirements
