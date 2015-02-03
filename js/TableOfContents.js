@@ -135,11 +135,21 @@ function (
                         layerClass += ' ';
                         layerClass += this.css.firstLayer;
                     }
-                    if (layer.visibility) {
-                        layerClass += ' ';
-                        layerClass += this.css.visible;
-                        titleCheckBoxClass += ' ';
-                        titleCheckBoxClass += this.css.checkboxCheck;
+                    
+                    if(this._isGraphicsLayer(layer)){
+	                    if (layer.visible) {
+	                        layerClass += ' ';
+	                        layerClass += this.css.visible;
+	                        titleCheckBoxClass += ' ';
+	                        titleCheckBoxClass += this.css.checkboxCheck;
+	                    }
+                    }else{
+	                    if (layer.visibility) {
+	                        layerClass += ' ';
+	                        layerClass += this.css.visible;
+	                        titleCheckBoxClass += ' ';
+	                        titleCheckBoxClass += this.css.checkboxCheck;
+	                    }
                     }
                     // layer node
                     var layerDiv = domConstruct.create("div", {
@@ -162,11 +172,19 @@ function (
                     });
                     domConstruct.place(titleCheckbox, titleContainerDiv, "last");
                     // Title text
-                    var titleText = domConstruct.create("div", {
-                        className: this.css.titleText,
-                        title: layer.title,
-                        innerHTML: layer.title
-                    });
+                    if(this._isGraphicsLayer(layer)) {
+                    		var titleText = domConstruct.create("div", {
+                            className: this.css.titleText,
+                            title: layer.id,
+                            innerHTML: layer.id
+                        });       	
+                    }else{
+                    		var titleText = domConstruct.create("div", {
+                            className: this.css.titleText,
+                            title: layer.title,
+                            innerHTML: layer.title
+                        });
+                    }
                     domConstruct.place(titleText, titleContainerDiv, "last");
                     // Account text
                     var accountText;
@@ -308,6 +326,8 @@ function (
                     // if it is a feature collection with layers
                     if (layer.featureCollection && layer.featureCollection.layers && layer.featureCollection.layers.length) {
                         this._featureLayerEvent(layer, i);
+                    } else if(this._isGraphicsLayer(layer)) {
+                    		this._layerEvent(layer, i);
                     } else {
                         // 1 layer object
                         layerObject = layer.layerObject;
@@ -353,6 +373,9 @@ function (
                     newVis = !layer.layerObject.visible;
                     layer.visibility = newVis;
                     layerObject.setVisibility(newVis);
+                } else if (this._isGraphicsLayer(layer)) {
+                		newVis = !layer.visible;
+                    layer.setVisibility(newVis);
                 }
             }
         },
@@ -371,6 +394,13 @@ function (
                 event.stop(evt);
             }));
             this._checkEvents.push(titleEvent);
+        },
+        _isGraphicsLayer: function(layer) {
+        		var isGl = false;
+        		if(layer.url == null && layer.type == undefined){
+        			isGl = true;
+        		}
+        		return isGl;
         },
         _init: function() {
             this._visible();
