@@ -53,12 +53,8 @@ define([
           content: "toc-content",
           titleCheckbox: "toc-checkbox",
           titleLabel: "toc-label",
-          accountText: "toc-account",
           visible: "toc-visible",
-          settingsIcon: "icon-cog",
-          settings: "toc-settings",
           actions: "toc-actions",
-          account: "toc-account",
           clear: "toc-clear"
         };
       },
@@ -186,26 +182,6 @@ define([
               "data-layer-index": i,
               textContent: title
             }, titleContainerDiv);
-            // Account text
-            var accountText;
-            if (layer.account) {
-              accountText = domConstruct.create("a", {
-                className: this.css.accountText,
-                id: layer.account
-              }, titleLabel);
-            }
-            // settings
-            var settingsDiv, settingsIcon;
-            if (layer.settings) {
-              settingsDiv = domConstruct.create("div", {
-                className: this.css.settings,
-                id: layer.settings
-              }, titleContainerDiv);
-              // settings icon
-              settingsIcon = domConstruct.create("div", {
-                className: this.css.settingsIcon
-              }, settingsDiv);
-            }
             // clear css
             var clearCSS = domConstruct.create("div", {
               className: this.css.clear
@@ -216,9 +192,6 @@ define([
               title: titleDiv,
               titleContainer: titleContainerDiv,
               titleLabel: titleLabel,
-              accountText: accountText,
-              settingsIcon: settingsIcon,
-              settingsDiv: settingsDiv,
               layer: layerDiv
             };
             this._nodes.push(nodesObj);
@@ -257,6 +230,7 @@ define([
         this._layerEvents.push(visChange);
       },
 
+      // todo
       _featureCollectionVisible: function (layer, index, visible) {
         // all layers either visible or not
         var equal;
@@ -284,6 +258,7 @@ define([
         }
       },
 
+      // todo
       _createFeatureLayerEvent: function (layer, index, i) {
         var layers = layer.featureCollection.layers;
         // layer visibility changes
@@ -294,6 +269,7 @@ define([
         this._layerEvents.push(visChange);
       },
 
+      // todo
       _featureLayerEvent: function (layer, index) {
         // feature collection layers
         var layers = layer.featureCollection.layers;
@@ -305,6 +281,7 @@ define([
         }
       },
 
+      // todo
       _setLayerEvents: function () {
         // this function sets up all the events for layers
         var layers = this.get("layers");

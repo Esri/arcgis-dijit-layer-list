@@ -23,15 +23,14 @@
 }
 
 .TableOfContents .toc-label {
-  float: left;
-  padding: 12px 0;
+  display: block;
+  padding: 10px 20px 10px 0;
   margin: 0;
-  width: 200px;
   line-height: 16px;
 }
 
 .esriRTL .TableOfContents .toc-label {
-  float: right;
+  padding: 10px 0 10px 20px;
 }
 
 .TableOfContents .toc-checkbox {
@@ -40,44 +39,11 @@
   width: 16px;
   margin: 0;
   padding: 0;
-  margin: 12px 8px;
+  margin: 10px 10px;
 }
 
 .esriRTL .TableOfContents .toc-checkbox {
   float: right;
-}
-
-.toc-settings {
-  cursor: pointer;
-  padding: 12px 0;
-  float: right;
-  margin-right: 15px;
-  color: #999;
-}
-
-.toc-settings:hover {
-  color: #333;
-}
-
-.toc-settings:active {
-  color: #97cbec;
-}
-
-.esriRTL .toc-settings {
-  margin-right: 0;
-  float: left;
-  margin-left: 15px;
-}
-
-.toc-account {
-  margin-left: 4px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.esriRTL .toc-account {
-  margin-left: 0;
-  margin-right: 4px;
 }
 
 @media screen and (max-width: 310px) {
