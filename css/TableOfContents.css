@@ -38,11 +38,12 @@
   width: 16px;
   margin: 0;
   padding: 0;
-  margin: 12px 10px;
+  margin: 12px 5px 12px 10px;
 }
 
 .esriRTL .TableOfContents .toc-checkbox {
   float: right;
+  margin: 12px 10px 12px 5px;
 }
 
 @media screen and (max-width: 310px) {
