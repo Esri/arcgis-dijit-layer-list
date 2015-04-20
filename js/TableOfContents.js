@@ -50,11 +50,9 @@ define([
           firstLayer: "toc-first-layer",
           title: "toc-title",
           titleContainer: "toc-title-container",
-          content: "toc-content",
           titleCheckbox: "toc-checkbox",
           titleLabel: "toc-label",
           visible: "toc-visible",
-          actions: "toc-actions",
           clear: "toc-clear"
         };
       },
@@ -135,14 +133,9 @@ define([
             if (i === (layers.length - 1)) {
               layerClass += " " + this.css.firstLayer;
             }
-            if (this._isGraphicsLayer(layer)) {
-              if (layer.visible) {
-                checked = true;
-              }
-            } else {
-              if (layer.visibility) {
-                checked = true;
-              }
+            // set checked state
+            if (layer.visibility || layer.visible) {
+              checked = true;
             }
             // checked class
             if (checked) {
@@ -170,16 +163,10 @@ define([
               className: this.css.titleCheckbox
             }, titleContainerDiv);
             // Title text
-            var title;
-            if (this._isGraphicsLayer(layer)) {
-              title = layer.id;
-            } else {
-              title = layer.title;
-            }
+            var title = layer.title || layer.id || "";
             var titleLabel = domConstruct.create("label", {
               for: this.id + "_checkbox_" + i,
               className: this.css.titleLabel,
-              "data-layer-index": i,
               textContent: title
             }, titleContainerDiv);
             // clear css
