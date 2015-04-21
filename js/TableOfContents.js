@@ -126,6 +126,11 @@ function (
             if (layers && layers.length) {
                 for (var i = 0; i < layers.length; i++) {
                     var layer = layers[i];
+                    
+                     if (layer.title === undefined) {
+                        layer.title = layer.id;
+                    }
+                    
                     // ceckbox class
                     var titleCheckBoxClass = this.css.titleCheckbox;
                     // layer class
