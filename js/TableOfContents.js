@@ -26,6 +26,7 @@ define([
     domClass, domStyle, domConstruct, domAttr,
     array
   ) {
+  // todo out of scale range
     var Widget = declare("esri.dijit.TableOfContents", [_WidgetBase, _TemplatedMixin, Evented], {
       templateString: dijitTemplate,
       // defaults
@@ -46,6 +47,9 @@ define([
         // classes
         this.css = {
           container: "toc-container",
+          list: "toc-list",
+          subList: "toc-sublist",
+          subListLayer: "toc-sublist-layer",
           layer: "toc-layer",
           firstLayer: "toc-first-layer",
           title: "toc-title",
@@ -61,9 +65,17 @@ define([
         var _self = this;
         // when checkbox is clicked
         this.own(on(this._layersNode, '.' + this.css.titleCheckbox + ':change', function () {
-          var index = parseInt(domAttr.get(this, "data-layer-index"), 10);
+          var data, subData, index, subIndex;
+          data = domAttr.get(this, "data-layer-index");
+          if(data){
+            index = parseInt(data, 10);
+          }
+          subData = domAttr.get(this, "data-sublayer-index");
+          if(subData){
+            subIndex = parseInt(subData, 10);
+          }
           // toggle layer visibility
-          _self._toggleLayer(index);
+          _self._toggleLayer(index, subIndex);
         }));
       },
 
@@ -115,6 +127,7 @@ define([
       /* ---------------- */
       /* Private Functions */
       /* ---------------- */
+      
       _createList: function () {
         var layers = this.get("layers");
         this._nodes = [];
@@ -142,7 +155,7 @@ define([
               layerClass += " " + this.css.visible;
             }
             // layer node
-            var layerDiv = domConstruct.create("div", {
+            var layerDiv = domConstruct.create("li", {
               className: layerClass
             });
             domConstruct.place(layerDiv, this._layersNode, "first");
@@ -150,6 +163,93 @@ define([
             var titleDiv = domConstruct.create("div", {
               className: this.css.title
             }, layerDiv);
+            
+            
+            var indeterminate = false;
+            var indeterminateArr = [];
+            
+            var sublayers = layer.layers;
+            if(sublayers && sublayers.length && sublayers.length > 0){
+              var subList = domConstruct.create("ul", {
+                className: this.css.subList
+              }, layerDiv);
+              for(var j = 0; j < sublayers.length; j++){
+                
+                
+                var sublayer = sublayers[j];
+                
+                
+                var subChecked = false;
+                
+
+                
+                if(sublayer.defaultVisibility){
+                  
+                  subChecked = true;
+                }
+                indeterminateArr.push(subChecked);
+               
+                
+                console.log(sublayer);
+                  
+                
+                
+                var subListItem = domConstruct.create("li", {
+                  className: this.css.subListLayer
+                }, subList);
+                
+                // title of layer
+                var subTitleDiv = domConstruct.create("div", {
+                  className: this.css.title
+                }, subListItem);
+                // title container
+                var subTitleContainerDiv = domConstruct.create("div", {
+                  className: this.css.titleContainer
+                }, subTitleDiv);
+                // Title checkbox
+                var subTitleCheckbox = domConstruct.create("input", {
+                  type: "checkbox",
+                  id: this.id + "_checkbox_sub_" + i + "_" + j,
+                  "data-layer-index": i,
+                  "data-sublayer-index": j,
+                  checked: subChecked,
+                  className: this.css.titleCheckbox
+                }, subTitleContainerDiv);
+                // Title text
+                var subTitle = sublayer.name || "";
+                var subTitleLabel = domConstruct.create("label", {
+                  for: this.id + "_checkbox_sub_" + i + "_" + j,
+                  className: this.css.titleLabel,
+                  textContent: subTitle
+                }, subTitleContainerDiv);
+                // clear css
+                var subClearCSS = domConstruct.create("div", {
+                  className: this.css.clear
+                }, subTitleContainerDiv);
+                
+              }
+              
+            }
+            
+            
+            
+            
+            if(array.every(indeterminateArr , function(item){
+              return item === true;
+            })){
+              indeterminate = false;
+            }else{
+              if(array.every(indeterminateArr , function(item2){
+                return item2 === false;
+              })){
+                indeterminate = false;
+              }else{
+                indeterminate = true;
+                checked = false;
+              }
+            }
+            
+            
             // title container
             var titleContainerDiv = domConstruct.create("div", {
               className: this.css.titleContainer
@@ -159,6 +259,7 @@ define([
               type: "checkbox",
               id: this.id + "_checkbox_" + i,
               "data-layer-index": i,
+              indeterminate: indeterminate,
               checked: checked,
               className: this.css.titleCheckbox
             }, titleContainerDiv);
@@ -291,7 +392,7 @@ define([
         }
       },
 
-      _toggleLayer: function (layerIndex) {
+      _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
         if (this.layers && this.layers.length) {
           var newVis;
@@ -300,6 +401,7 @@ define([
           var featureCollection = layer.featureCollection;
           var visibleLayers;
           var i;
+          
           if (featureCollection) {
             // visible feature layers
             visibleLayers = layer.visibleLayers;
@@ -324,9 +426,72 @@ define([
               }
             }
           } else if (layerObject) {
-            newVis = !layer.layerObject.visible;
-            layer.visibility = newVis;
-            layerObject.setVisibility(newVis);
+            
+
+            // layers visible
+            visibleLayers = layerObject.visibleLayers;
+            
+            if (typeof subLayerIndex !== 'undefined' && layerObject.hasOwnProperty('visibleLayers')) {
+              // remove -1 from visible layers if its there
+              var negative = array.lastIndexOf(visibleLayers, -1);
+              if (negative !== -1) {
+                  visibleLayers.splice(negative, 1);
+              }
+              // find sublayer index in visible layers
+              var found = array.lastIndexOf(visibleLayers, subLayerIndex);
+              if (found !== -1) {
+                  // found position
+                  visibleLayers.splice(found, 1);
+                  // set invisible
+                  newVis = false;
+              } else {
+                  // position not found
+                  visibleLayers.push(subLayerIndex);
+                  // set visible
+                  newVis = true;
+              }
+              // if visible layers is empty we need -1 in there
+              if (visibleLayers.length === 0) {
+                  visibleLayers.push(-1);
+              }
+              layer.visibility = newVis;
+              // update visible
+              layerObject.setVisibleLayers(visibleLayers);
+            }
+            else{
+              
+              newVis = !layer.layerObject.visible;
+              
+              var newVisLayers = [];
+              var sublayers = layer.layers;
+
+              if(sublayers && sublayers.length){
+                for(i = 0; i < sublayers.length; i++){
+                  var sublayer = sublayers[i];
+                  if(newVis){
+                    newVisLayers.push(sublayer.id);
+                  }
+                  sublayer.defaultVisibility = newVis;
+                }
+              }
+
+              // update visible
+              layerObject.setVisibleLayers(newVisLayers);
+              
+              
+              
+              layer.visibility = newVis;
+              layerObject.setVisibility(newVis);
+              
+              this.refresh();
+              
+              
+              
+            }
+            
+            
+            
+            
           } else if (this._isGraphicsLayer(layer)) {
             newVis = !layer.visible;
             layer.setVisibility(newVis);
