@@ -7,7 +7,7 @@
   <title>TOC Dijit</title>
   <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.13/esri/css/esri.css">
   <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.13/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" type="text/css" href="css/TableOfContents.css">
+  <link rel="stylesheet" type="text/css" href="js/TableOfContents/css/TableOfContents.css">
   <style type="text/css">
     body {
       margin: 40px;
@@ -84,6 +84,7 @@
   </script>
   <script src="http://js.arcgis.com/3.13/" type="text/javascript"></script>
   <script type="text/javascript">
+    var map;
     require(["dojo/_base/lang", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, Map, TableOfContents, arcgisUtils, on, dom) {
 
       // b591577a424242e8ae4667de053c3ffa
@@ -96,7 +97,7 @@
           //turn the slider off, display info windows, disable wraparound 180, slider position and more. 
         }
       }).then(lang.hitch(this, function (response) {
-        var map = response.map;
+        map = response.map;
         var layers = response.itemInfo.itemData.operationalLayers;
 
         console.log(layers);

@@ -17,7 +17,7 @@ define([
 
   "esri/kernel",
 
-  "dojo/text!application/dijit/templates/TableOfContents.html"
+  "dojo/text!./TableOfContents/templates/TableOfContents.html"
 ],
   function (
     array, declare, lang,
@@ -67,10 +67,12 @@ define([
         // when checkbox is clicked
         this.own(on(this._layersNode, '.' + this.css.checkbox + ':change', function () {
           var data, subData, index, subIndex;
+          // layer index
           data = domAttr.get(this, "data-layer-index");
           if (data) {
             index = parseInt(data, 10);
           }
+          // sublayer index
           subData = domAttr.get(this, "data-sublayer-index");
           if (subData) {
             subIndex = parseInt(subData, 10);
@@ -215,12 +217,12 @@ define([
                 }, subTitleContainerNode);
                 // object of sublayer nodes
                 var subNode = {
-                  subListNode: subListNode,
-                  subTitleNode: subTitleNode,
-                  subTitleContainerNode: subTitleContainerNode,
-                  subCheckboxNode: subCheckboxNode,
-                  subLabelNode: subLabelNode,
-                  subClearNode: subClearNode
+                  subList: subListNode,
+                  subTitle: subTitleNode,
+                  subTitleContainer: subTitleContainerNode,
+                  subCheckbox: subCheckboxNode,
+                  subLabel: subLabelNode,
+                  subClear: subClearNode
                 };
                 // add node to array
                 subNodes.push(subNode);
@@ -258,7 +260,7 @@ define([
               titleContainer: titleContainerNode,
               label: labelNode,
               layer: layerNode,
-              clearCSS: clearNode,
+              clear: clearNode,
               subNodes: subNodes
             };
             this._nodes.push(nodesObj);
@@ -282,7 +284,7 @@ define([
         // if its a sublayer
         if (subIndex !== null) {
           // update checkbox and layer visibility classes
-          domAttr.set(this._nodes[index].subNodes[subIndex].subCheckboxNode, "checked", visible);
+          domAttr.set(this._nodes[index].subNodes[subIndex].subCheckbox, "checked", visible);
         }
         // parent layer
         else {
