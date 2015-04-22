@@ -1,41 +1,44 @@
 define([
-    "dojo/Evented",
-    "dojo/_base/declare",
-    "dojo/_base/lang",
-    "dojo/has",
-    "esri/kernel",
-    "dijit/_WidgetBase",
-    "dijit/_TemplatedMixin",
-    "dojo/on",
-    // load template    
-    "dojo/text!application/dijit/templates/TableOfContents.html",
-    "dojo/dom-class",
-    "dojo/dom-style",
-    "dojo/dom-construct",
-    "dojo/dom-attr",
-    "dojo/_base/array"
+  "dojo/_base/array",
+  "dojo/_base/declare",
+  "dojo/_base/lang",
+
+  "dojo/Evented",
+  "dojo/has",
+  "dojo/on",
+
+  "dojo/dom-class",
+  "dojo/dom-style",
+  "dojo/dom-construct",
+  "dojo/dom-attr",
+
+  "dijit/_WidgetBase",
+  "dijit/_TemplatedMixin",
+
+  "esri/kernel",
+
+  "dojo/text!application/dijit/templates/TableOfContents.html"
 ],
   function (
-    Evented,
-    declare,
-    lang,
-    has, esriNS,
-    _WidgetBase, _TemplatedMixin,
-    on,
-    dijitTemplate,
+    array, declare, lang,
+    Evented, has, on,
     domClass, domStyle, domConstruct, domAttr,
-    array
+    _WidgetBase, _TemplatedMixin,
+    esriNS,
+    dijitTemplate
   ) {
     // todo out of scale range
     var Widget = declare("esri.dijit.TableOfContents", [_WidgetBase, _TemplatedMixin, Evented], {
+
       templateString: dijitTemplate,
-      // defaults
+
       options: {
         theme: "TableOfContents",
         map: null,
         layers: null,
         visible: true
       },
+
       // lifecycle: 1
       constructor: function (options, srcRefNode) {
         // mix in settings and defaults
@@ -46,24 +49,23 @@ define([
         this.set(defaults);
         // classes
         this.css = {
-          container: "toc-container",
-          list: "toc-list",
-          subList: "toc-sublist",
-          subListLayer: "toc-sublist-layer",
-          layer: "toc-layer",
-          firstLayer: "toc-first-layer",
-          title: "toc-title",
-          titleContainer: "toc-title-container",
-          titleCheckbox: "toc-checkbox",
-          titleLabel: "toc-label",
-          clear: "toc-clear"
+          container: "tocContainer",
+          list: "tocList",
+          subList: "tocSubList",
+          subListLayer: "tocSubListLayer",
+          layer: "tocLayer",
+          title: "tocTitle",
+          titleContainer: "tocTitleContainer",
+          checkbox: "tocCheckbox",
+          label: "tocLabel",
+          clear: "tocClear"
         };
       },
 
       postCreate: function () {
         var _self = this;
         // when checkbox is clicked
-        this.own(on(this._layersNode, '.' + this.css.titleCheckbox + ':change', function () {
+        this.own(on(this._layersNode, '.' + this.css.checkbox + ':change', function () {
           var data, subData, index, subIndex;
           data = domAttr.get(this, "data-layer-index");
           if (data) {
@@ -100,13 +102,13 @@ define([
         this._removeEvents();
         this.inherited(arguments);
       },
+
       /* ---------------- */
       /* Public Events */
       /* ---------------- */
       // load
       // toggle
-      // expand
-      // collapse
+
       /* ---------------- */
       /* Public Functions */
       /* ---------------- */
@@ -126,6 +128,7 @@ define([
       /* ---------------- */
       /* Private Functions */
       /* ---------------- */
+
       _checkboxStatus: function (layerIndex) {
         // get layer
         var layer = this.layers[layerIndex];
@@ -136,8 +139,9 @@ define([
         }
         return checked;
       },
+
       _createList: function () {
-        var layers = this.get("layers");
+        var layers = this.layers;
         this._nodes = [];
         // kill events
         this._removeEvents();
@@ -154,14 +158,14 @@ define([
               sublayers = layerObject.layerInfos;
             }
             // layer node
-            var layerDiv = domConstruct.create("li", {
+            var layerNode = domConstruct.create("li", {
               className: this.css.layer
             });
-            domConstruct.place(layerDiv, this._layersNode, "first");
+            domConstruct.place(layerNode, this._layersNode, "first");
             // title of layer
-            var titleDiv = domConstruct.create("div", {
+            var titleNode = domConstruct.create("div", {
               className: this.css.title
-            }, layerDiv);
+            }, layerNode);
             // nodes for sublayers
             var subNodes = [];
             var layerType = layer.layerType;
@@ -170,7 +174,7 @@ define([
               // create sublayer list
               var subList = domConstruct.create("ul", {
                 className: this.css.subList
-              }, layerDiv);
+              }, layerNode);
               // create each sublayer item
               for (var j = 0; j < sublayers.length; j++) {
                 // sublayer info
@@ -178,45 +182,45 @@ define([
                 // default checked state
                 var subChecked = sublayer.defaultVisibility;
                 // list item node
-                var subListItem = domConstruct.create("li", {
+                var subListNode = domConstruct.create("li", {
                   className: this.css.subListLayer
                 }, subList);
                 // title of sublayer layer
-                var subTitleDiv = domConstruct.create("div", {
+                var subTitleNode = domConstruct.create("div", {
                   className: this.css.title
-                }, subListItem);
+                }, subListNode);
                 // sublayer title container
-                var subTitleContainerDiv = domConstruct.create("div", {
+                var subTitleContainerNode = domConstruct.create("div", {
                   className: this.css.titleContainer
-                }, subTitleDiv);
+                }, subTitleNode);
                 // sublayer checkbox
-                var subTitleCheckbox = domConstruct.create("input", {
+                var subCheckboxNode = domConstruct.create("input", {
                   type: "checkbox",
                   id: this.id + "_checkbox_sub_" + i + "_" + j,
                   "data-layer-index": i,
                   "data-sublayer-index": j,
                   checked: subChecked,
-                  className: this.css.titleCheckbox
-                }, subTitleContainerDiv);
+                  className: this.css.checkbox
+                }, subTitleContainerNode);
                 // sublayer Title text
                 var subTitle = sublayer.name || "";
-                var subTitleLabel = domConstruct.create("label", {
+                var subLabelNode = domConstruct.create("label", {
                   for: this.id + "_checkbox_sub_" + i + "_" + j,
-                  className: this.css.titleLabel,
+                  className: this.css.label,
                   textContent: subTitle
-                }, subTitleContainerDiv);
+                }, subTitleContainerNode);
                 // sublayer clear css
-                var subClearCSS = domConstruct.create("div", {
+                var subClearNode = domConstruct.create("div", {
                   className: this.css.clear
-                }, subTitleContainerDiv);
+                }, subTitleContainerNode);
                 // object of sublayer nodes
                 var subNode = {
-                  subListItem: subListItem,
-                  subTitleDiv: subTitleDiv,
-                  subTitleContainerDiv: subTitleContainerDiv,
-                  subTitleCheckbox: subTitleCheckbox,
-                  subTitleLabel: subTitleLabel,
-                  subClearCSS: subClearCSS
+                  subListNode: subListNode,
+                  subTitleNode: subTitleNode,
+                  subTitleContainerNode: subTitleContainerNode,
+                  subCheckboxNode: subCheckboxNode,
+                  subLabelNode: subLabelNode,
+                  subClearNode: subClearNode
                 };
                 // add node to array
                 subNodes.push(subNode);
@@ -225,35 +229,36 @@ define([
             // get parent layer checkbox status
             var status = this._checkboxStatus(i);
             // title container
-            var titleContainerDiv = domConstruct.create("div", {
+            var titleContainerNode = domConstruct.create("div", {
               className: this.css.titleContainer
-            }, titleDiv);
+            }, titleNode);
             // Title checkbox
-            var titleCheckbox = domConstruct.create("input", {
+            var checkboxNode = domConstruct.create("input", {
               type: "checkbox",
               id: this.id + "_checkbox_" + i,
               "data-layer-index": i,
               checked: status,
-              className: this.css.titleCheckbox
-            }, titleContainerDiv);
+              className: this.css.checkbox
+            }, titleContainerNode);
             // Title text
             var title = layer.title || layer.id || "";
-            var titleLabel = domConstruct.create("label", {
+            var labelNode = domConstruct.create("label", {
               for: this.id + "_checkbox_" + i,
-              className: this.css.titleLabel,
+              className: this.css.label,
               textContent: title
-            }, titleContainerDiv);
+            }, titleContainerNode);
             // clear css
-            var clearCSS = domConstruct.create("div", {
+            var clearNode = domConstruct.create("div", {
               className: this.css.clear
-            }, titleContainerDiv);
+            }, titleContainerNode);
             // lets save all the nodes for events
             var nodesObj = {
-              checkbox: titleCheckbox,
-              title: titleDiv,
-              titleContainer: titleContainerDiv,
-              titleLabel: titleLabel,
-              layer: layerDiv,
+              checkbox: checkboxNode,
+              title: titleNode,
+              titleContainer: titleContainerNode,
+              label: labelNode,
+              layer: layerNode,
+              clearCSS: clearNode,
               subNodes: subNodes
             };
             this._nodes.push(nodesObj);
@@ -273,26 +278,95 @@ define([
         this._layerEvents = [];
       },
 
-      // todo support sublayers
-      _toggleVisible: function (index, visible) {
-        // update checkbox and layer visibility classes
-        domAttr.set(this._nodes[index].checkbox, "checked", visible);
+      _toggleVisible: function (index, subIndex, visible) {
+        // if its a sublayer
+        if (subIndex !== null) {
+          // update checkbox and layer visibility classes
+          domAttr.set(this._nodes[index].subNodes[subIndex].subCheckboxNode, "checked", visible);
+        }
+        // parent layer
+        else {
+          // update checkbox and layer visibility classes
+          domAttr.set(this._nodes[index].checkbox, "checked", visible);
+        }
+        // emit event
         this.emit("toggle", {
-          index: index,
+          layerIndex: index,
+          subLayerIndex: subIndex,
           visible: visible
         });
       },
 
-      // todo support sublayers
-      _layerEvent: function (layer, index) {
+      _layerVisChangeEvent: function (index, featureCollection, subLayerIndex) {
+        var layers = this.layers;
+        var layer = layers[index];
+        var layerObject;
+        // layer is a feature collection
+        if (featureCollection) {
+          // all sublayers
+          var fcLayers = layer.featureCollection.layers;
+          // current layer object to setup event for
+          layerObject = fcLayers[subLayerIndex].layerObject;
+        } else {
+          // layer object for event
+          layerObject = layer.layerObject;
+        }
         // layer visibility changes
-        var visChange = on(layer, 'visibility-change', lang.hitch(this, function (evt) {
-          // update checkbox and layer visibility classes
-          this._toggleVisible(index, evt.visible);
+        var visChange = on(layerObject, 'visibility-change', lang.hitch(this, function (evt) {
+          if (featureCollection) {
+            this._featureCollectionVisible(index, evt.visible);
+          } else {
+            // update checkbox and layer visibility classes
+            this._toggleVisible(index, null, evt.visible);
+          }
         }));
         this._layerEvents.push(visChange);
       },
 
+      _layerEvent: function (index) {
+        var layers = this.layers;
+        var layer = layers[index];
+        var layerObject = layer.layerObject;
+        // feature collection events
+        if (layer.featureCollection && layer.featureCollection.layers && layer.featureCollection.layers.length) {
+          // feature collection layers
+          var fsLayers = layer.featureCollection.layers;
+          if (fsLayers && fsLayers.length) {
+            // make event for each layer
+            for (var i = 0; i < fsLayers.length; i++) {
+              // layer visibility changes
+              this._layerVisChangeEvent(index, true, i);
+            }
+          }
+        } else {
+          // layer visibility changes
+          this._layerVisChangeEvent(index, false, null);
+          // if we have a map service
+          if (layer.layerType && layer.layerType === "ArcGISMapServiceLayer") {
+            var subVisChange = on(layerObject, 'visible-layers-change', lang.hitch(this, function (evt) {
+              // new visible layers
+              var visibleLayers = evt.visibleLayers;
+              // all sublayer info
+              var layerInfos = layerObject.layerInfos;
+              for (var i = 0; i < layerInfos.length; i++) {
+                var subLayerIndex = layerInfos[i].id;
+                var found = array.indexOf(visibleLayers, subLayerIndex);
+                // not found
+                if (found === -1) {
+                  layerInfos[subLayerIndex].defaultVisibility = false;
+                  this._toggleVisible(index, subLayerIndex, false);
+                }
+                // found
+                else {
+                  layerInfos[subLayerIndex].defaultVisibility = true;
+                  this._toggleVisible(index, subLayerIndex, true);
+                }
+              }
+            }));
+            this._layerEvents.push(subVisChange);
+          }
+        }
+      },
 
       _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
@@ -362,15 +436,17 @@ define([
               layer.visibility = newVis;
               layerObject.setVisibility(newVis);
             }
-          } else if (this._isGraphicsLayer(layer)) {
+          }
+          // todo ? graphics layer support test
+          else if (this._isGraphicsLayer(layer)) {
             newVis = !layer.visible;
             layer.setVisibility(newVis);
           }
         }
       },
 
-      // todo
-      _featureCollectionVisible: function (layer, index, visible) {
+      _featureCollectionVisible: function (index, visible) {
+        var layer = this.layers[index];
         // all layers either visible or not
         var equal;
         // feature collection layers turned on by default
@@ -393,56 +469,23 @@ define([
         }
         // all are the same
         if (equal) {
-          this._toggleVisible(index, visible);
+          this._toggleVisible(index, null, visible);
         }
       },
 
-      // todo
-      _createFeatureLayerEvent: function (layer, index, i) {
-        var layers = layer.featureCollection.layers;
-        // layer visibility changes
-        var visChange = on(layers[i].layerObject, 'visibility-change', lang.hitch(this, function (evt) {
-          var visible = evt.visible;
-          this._featureCollectionVisible(layer, index, visible);
-        }));
-        this._layerEvents.push(visChange);
-      },
-
-      // todo
-      _featureLayerEvent: function (layer, index) {
-        // feature collection layers
-        var layers = layer.featureCollection.layers;
-        if (layers && layers.length) {
-          // make event for each layer
-          for (var i = 0; i < layers.length; i++) {
-            this._createFeatureLayerEvent(layer, index, i);
-          }
-        }
-      },
-
-      // todo
       _setLayerEvents: function () {
         // this function sets up all the events for layers
-        var layers = this.get("layers");
-        var layerObject;
+        var layers = this.layers;
         if (layers && layers.length) {
           // get all layers
           for (var i = 0; i < layers.length; i++) {
-            var layer = layers[i];
-            // if it is a feature collection with layers
-            if (layer.featureCollection && layer.featureCollection.layers && layer.featureCollection.layers.length) {
-              this._featureLayerEvent(layer, i);
-            } else if (this._isGraphicsLayer(layer)) {
-              this._layerEvent(layer, i);
-            } else {
-              // 1 layer object
-              layerObject = layer.layerObject;
-              this._layerEvent(layerObject, i);
-            }
+            // create necessary events
+            this._layerEvent(i);
           }
         }
       },
 
+      // todo test graphics layer
       _isGraphicsLayer: function (layer) {
         var isGl = false;
         if (layer.url === null && layer.type === undefined) {
@@ -460,7 +503,7 @@ define([
       },
 
       _visible: function () {
-        if (this.get("visible")) {
+        if (this.visible) {
           domStyle.set(this.domNode, 'display', 'block');
         } else {
           domStyle.set(this.domNode, 'display', 'none');

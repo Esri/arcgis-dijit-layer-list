@@ -1,19 +1,22 @@
-.TableOfContents {
-  width: 280px;
-}
-
-.TableOfContents .toc-list, .TableOfContents .toc-layer, .TableOfContents .toc-sublist, .TableOfContents .toc-sublist-layer {
+.TableOfContents .tocList,
+.TableOfContents .tocLayer,
+.TableOfContents .tocSubList,
+.TableOfContents .tocSubListLayer {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.TableOfContents .toc-sublist{
+.TableOfContents .tocSubList {
   margin: 0 0 0 20px;
   background: #e0e0e0;
 }
 
-.TableOfContents .toc-title {
+.dj_rtl .TableOfContents .tocSubList {
+  margin: 0 20px 0 0;
+}
+
+.TableOfContents .tocTitle {
   border-bottom: 1px solid #e0e0e0;
   font-size: 16px;
   line-height: 20px;
@@ -22,50 +25,40 @@
   user-select: none;
 }
 
-.TableOfContents .toc-layer:first-child .toc-title {
+.TableOfContents .tocLayer:first-child .tocTitle {
   border-top: 1px solid #e0e0e0;
 }
 
-.TableOfContents .toc-title-container {
+.TableOfContents .tocTitleContainer {
   background: #f8f8f8;
   color: #555;
   position: relative;
   zoom: 1;
 }
 
-.TableOfContents .toc-label {
+.TableOfContents .tocLabel {
   display: block;
   padding: 10px 20px 10px 32px;
   margin: 0;
 }
 
-.esriRTL .TableOfContents .toc-label {
-  padding: 10px 0 10px 20px;
+.dj_rtl .TableOfContents .tocLabel {
+  padding: 10px 32px 10px 20px;
 }
 
-.TableOfContents .toc-checkbox {
+.TableOfContents .tocCheckbox {
   float: left;
   height: 16px;
   width: 16px;
-  margin: 0;
   padding: 0;
   margin: 12px 5px 12px 10px;
 }
 
-.esriRTL .TableOfContents .toc-checkbox {
+.dj_rtl .TableOfContents .tocCheckbox {
   float: right;
   margin: 12px 10px 12px 5px;
 }
 
-@media screen and (max-width: 310px) {
-  .TableOfContents {
-    width: auto;
-  }
-  .TableOfContents .toc-label {
-    width: 60%;
-  }
-}
-
-.toc-clear {
+.tocClear {
   clear: both;
 }
