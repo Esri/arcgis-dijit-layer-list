@@ -71,7 +71,7 @@ define([
           if (data) {
             index = parseInt(data, 10);
           }
-          // sublayer index
+          // subLayer index
           subData = domAttr.get(this, "data-sublayer-index");
           if (subData) {
             subIndex = parseInt(subData, 10);
@@ -151,12 +151,12 @@ define([
         // if we got layers
         if (layers && layers.length) {
           for (var i = 0; i < layers.length; i++) {
-            var sublayers, folders;
+            var subLayers, folders;
             var layer = layers[i];
             var layerObject = layer.layerObject;
             if (layerObject) {
-              // sublayers from thier info
-              sublayers = layerObject.layerInfos;
+              // subLayers from thier info
+              subLayers = layerObject.layerInfos;
             }
             // layer node
             var layerNode = domConstruct.create("li", {
@@ -167,7 +167,7 @@ define([
             var titleNode = domConstruct.create("div", {
               className: this.css.title
             }, layerNode);
-            // nodes for sublayers
+            // nodes for subLayers
             var subNodes = [];
             var layerType = layer.layerType;
             // get parent layer checkbox status
@@ -206,48 +206,49 @@ define([
               subNodes: subNodes
             };
             this._nodes[i] = nodesObj;
-            // todo 1.0: kml layers sublayers. Need to wait for layer to load. :(
+            // todo 1.0: wait for layer to be loaded before adding sublayers.
+            // todo 1.0: kml layers subLayers
             if (layerType === "KML") {
-              sublayers = layerObject.folders;
+              subLayers = layerObject.folders;
             }
-            // if we have more than one sublayer and layer is of valid type for sublayers
-            if (layerType !== "ArcGISTiledMapServiceLayer" && sublayers && sublayers.length) {
-              // create sublayer list
+            // if we have more than one subLayer and layer is of valid type for subLayers
+            if (layerType !== "ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+              // create subLayer list
               var subListNode = domConstruct.create("ul", {
                 className: this.css.subList
               }, layerNode);
-              // create each sublayer item
-              for (var j = 0; j < sublayers.length; j++) {
-                // sublayer info
-                var sublayer = sublayers[j];
-                var subLayerIndex = sublayer.id;
+              // create each subLayer item
+              for (var j = 0; j < subLayers.length; j++) {
+                // subLayer info
+                var subLayer = subLayers[j];
+                var subLayerIndex = subLayer.id;
                 var parentId;
                 if (layerType === "KML") {
-                  parentId = sublayer.parentFolderId;
+                  parentId = subLayer.parentFolderId;
                 } else {
-                  parentId = sublayer.parentLayerId;
+                  parentId = subLayer.parentLayerId;
                 }
-                // place sublayers not in the root
+                // place subLayers not in the root
                 if (parentId !== -1) {
                   subListNode = domConstruct.create("ul", {
                     className: this.css.subList
                   }, this._nodes[i].subNodes[parentId].subLayer);
                 }
                 // default checked state
-                var subChecked = sublayer.defaultVisibility;
+                var subChecked = subLayer.defaultVisibility;
                 // list item node
                 var subLayerNode = domConstruct.create("li", {
                   className: this.css.subListLayer
                 }, subListNode);
-                // title of sublayer layer
+                // title of subLayer layer
                 var subTitleNode = domConstruct.create("div", {
                   className: this.css.title
                 }, subLayerNode);
-                // sublayer title container
+                // subLayer title container
                 var subTitleContainerNode = domConstruct.create("div", {
                   className: this.css.titleContainer
                 }, subTitleNode);
-                // sublayer checkbox
+                // subLayer checkbox
                 var subCheckboxNode = domConstruct.create("input", {
                   type: "checkbox",
                   id: this.id + "_checkbox_sub_" + i + "_" + j,
@@ -256,18 +257,18 @@ define([
                   checked: subChecked,
                   className: this.css.checkbox
                 }, subTitleContainerNode);
-                // sublayer Title text
-                var subTitle = sublayer.name || "";
+                // subLayer Title text
+                var subTitle = subLayer.name || "";
                 var subLabelNode = domConstruct.create("label", {
                   for: this.id + "_checkbox_sub_" + i + "_" + j,
                   className: this.css.label,
                   textContent: subTitle
                 }, subTitleContainerNode);
-                // sublayer clear css
+                // subLayer clear css
                 var subClearNode = domConstruct.create("div", {
                   className: this.css.clear
                 }, subTitleContainerNode);
-                // object of sublayer nodes
+                // object of subLayer nodes
                 var subNode = {
                   subList: subListNode,
                   subLayer: subLayerNode,
@@ -322,7 +323,7 @@ define([
         var layerObject;
         // layer is a feature collection
         if (featureCollection) {
-          // all sublayers
+          // all subLayers
           var fcLayers = layer.featureCollection.layers;
           // current layer object to setup event for
           layerObject = fcLayers[subLayerIndex].layerObject;
@@ -385,12 +386,12 @@ define([
             var subVisChange = on(layerObject, 'visible-layers-change', lang.hitch(this, function (evt) {
               // new visible layers
               var visibleLayers = evt.visibleLayers;
-              // all sublayer info
+              // all subLayer info
               var layerInfos = layerObject.layerInfos;
-              // go through all sublayers
+              // go through all subLayers
               for (var i = 0; i < layerInfos.length; i++) {
                 var subLayerIndex = layerInfos[i].id;
-                // is sublayer in visible layers array
+                // is subLayer in visible layers array
                 var found = array.indexOf(visibleLayers, subLayerIndex);
                 // not found
                 if (found === -1) {
@@ -446,7 +447,7 @@ define([
           // map service
           else if (layerObject) {
             var layerInfos = layerObject.layerInfos;
-            // setting sublayer visibility
+            // setting subLayer visibility
             if (typeof subLayerIndex !== 'undefined' && layerObject.hasOwnProperty('visibleLayers')) {
               // array for setting visible layers
               visibleLayers = [-1];
