@@ -151,7 +151,7 @@ define([
         // if we got layers
         if (layers && layers.length) {
           for (var i = 0; i < layers.length; i++) {
-            var subLayers, folders;
+            var subLayers;
             var layer = layers[i];
             var layerObject = layer.layerObject;
             if (layerObject) {
@@ -208,6 +208,7 @@ define([
             this._nodes[i] = nodesObj;
             // todo 1.0: wait for layer to be loaded before adding sublayers.
             // todo 1.0: kml layers subLayers
+            // todo 1.0 kml toggling sublayers
             if (layerType === "KML") {
               subLayers = layerObject.folders;
             }
