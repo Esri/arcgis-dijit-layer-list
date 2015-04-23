@@ -86,12 +86,15 @@
   <script type="text/javascript">
     var map;
     require(["dojo/_base/lang", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, Map, TableOfContents, arcgisUtils, on, dom) {
-
+      // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
+      
       // b591577a424242e8ae4667de053c3ffa
 
       // df8bcc10430f48878b01c96e907a1fc3
+      
+      arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
 
-      arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
+      arcgisUtils.createMap('62c2a1a6ac8f4329b34d3dcf7ad47099', "map", {
         mapOptions: {
           //Optionally define additional map config here for example you can 
           //turn the slider off, display info windows, disable wraparound 180, slider position and more. 

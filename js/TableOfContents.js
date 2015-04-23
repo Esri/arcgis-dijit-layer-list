@@ -27,7 +27,6 @@ define([
     esriNS,
     dijitTemplate
   ) {
-    // todo out of scale range
     var Widget = declare("esri.dijit.TableOfContents", [_WidgetBase, _TemplatedMixin, Evented], {
 
       templateString: dijitTemplate,
@@ -152,6 +151,12 @@ define([
         // if we got layers
         if (layers && layers.length) {
           for (var i = 0; i < layers.length; i++) {
+            
+            // todo sublayers for multiple levels.
+            
+            // todo kml layers sublayers
+            
+            
             var sublayers;
             var layer = layers[i];
             var layerObject = layer.layerObject;
@@ -184,13 +189,13 @@ define([
                 // default checked state
                 var subChecked = sublayer.defaultVisibility;
                 // list item node
-                var subListNode = domConstruct.create("li", {
+                var subLayerNode = domConstruct.create("li", {
                   className: this.css.subListLayer
                 }, subList);
                 // title of sublayer layer
                 var subTitleNode = domConstruct.create("div", {
                   className: this.css.title
-                }, subListNode);
+                }, subLayerNode);
                 // sublayer title container
                 var subTitleContainerNode = domConstruct.create("div", {
                   className: this.css.titleContainer
@@ -217,7 +222,7 @@ define([
                 }, subTitleContainerNode);
                 // object of sublayer nodes
                 var subNode = {
-                  subList: subListNode,
+                  subLayer: subLayerNode,
                   subTitle: subTitleNode,
                   subTitleContainer: subTitleContainerNode,
                   subCheckbox: subCheckboxNode,
@@ -323,6 +328,26 @@ define([
           }
         }));
         this._layerEvents.push(visChange);
+        
+        // todo 2.0 out of scale range
+        /* 
+        // scale visibility changes
+        var scaleVisChange = on(layerObject, 'scale-visibility-change', lang.hitch(this, function (evt) {
+          var layer = evt.target;
+          var visible = layer.visibleAtMapScale;
+          
+          console.log(layer);
+          
+          if(visible){
+            
+          }
+          else{
+            
+          }
+        }));
+        this._layerEvents.push(scaleVisChange);
+        */
+        
       },
 
       _layerEvent: function (index) {
@@ -350,8 +375,10 @@ define([
               var visibleLayers = evt.visibleLayers;
               // all sublayer info
               var layerInfos = layerObject.layerInfos;
+              // go through all sublayers
               for (var i = 0; i < layerInfos.length; i++) {
                 var subLayerIndex = layerInfos[i].id;
+                // is sublayer in visible layers array
                 var found = array.indexOf(visibleLayers, subLayerIndex);
                 // not found
                 if (found === -1) {
