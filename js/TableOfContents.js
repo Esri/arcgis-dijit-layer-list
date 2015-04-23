@@ -130,14 +130,14 @@ define([
       /* ---------------- */
       /* Private Functions */
       /* ---------------- */
-      
+
       _layerLoaded: function (layer) {
         var def = new Deferred();
         if (layer.loaded) {
           // nothing to do
           def.resolve(layer);
         } else if (layer.loadError) {
-          def.reject(this._error("Layer failed to load."));
+          def.reject("Layer failed to load.");
         } else {
           var loadedEvent, errorEvent;
           // once layer is loaded
@@ -148,7 +148,7 @@ define([
           // error occurred loading layer
           errorEvent = on.once(layer, "error", lang.hitch(this, function () {
             loadedEvent.remove();
-            def.reject(this._error("Layer could not be loaded."));
+            def.reject("Layer could not be loaded.");
           }));
         }
         return def.promise;
@@ -181,7 +181,6 @@ define([
             if (layerObject) {
               // sublayers from thier info
               sublayers = layerObject.layerInfos;
-              folders = layerObject.folders;
             }
             // layer node
             var layerNode = domConstruct.create("li", {
@@ -230,10 +229,17 @@ define([
               clear: clearNode,
               subNodes: subNodes
             };
-            this._nodes.push(nodesObj);
+            this._nodes[i] = nodesObj;
             // todo 1.0: kml layers sublayers
-            if(layerType === "KML" && folders && folders.length){
-              console.log(folders);
+            if (layerType === "KML") {
+              this._layerLoaded(layerObject).always(lang.hitch(this, function (evt) {
+                folders = evt.folders;
+
+
+
+
+
+              }));
             }
             // if we have more than one sublayer and layer is of valid type for sublayers
             if (layerType !== "ArcGISTiledMapServiceLayer" && sublayers && sublayers.length) {
@@ -297,7 +303,7 @@ define([
                   subClear: subClearNode
                 };
                 // add node to array
-                subNodes.push(subNode);
+                subNodes[j] = subNode;
               }
             }
           }
