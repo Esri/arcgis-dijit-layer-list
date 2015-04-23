@@ -4,7 +4,6 @@ define([
   "dojo/_base/lang",
 
   "dojo/Evented",
-  "dojo/Deferred",
   "dojo/has",
   "dojo/on",
 
@@ -22,7 +21,7 @@ define([
 ],
   function (
     array, declare, lang,
-    Evented, Deferred, has, on,
+    Evented, has, on,
     domClass, domStyle, domConstruct, domAttr,
     _WidgetBase, _TemplatedMixin,
     esriNS,
@@ -131,29 +130,6 @@ define([
       /* Private Functions */
       /* ---------------- */
 
-      _layerLoaded: function (layer) {
-        var def = new Deferred();
-        if (layer.loaded) {
-          // nothing to do
-          def.resolve(layer);
-        } else if (layer.loadError) {
-          def.reject("Layer failed to load.");
-        } else {
-          var loadedEvent, errorEvent;
-          // once layer is loaded
-          loadedEvent = on.once(layer, "load", lang.hitch(this, function () {
-            errorEvent.remove();
-            def.resolve(layer);
-          }));
-          // error occurred loading layer
-          errorEvent = on.once(layer, "error", lang.hitch(this, function () {
-            loadedEvent.remove();
-            def.reject("Layer could not be loaded.");
-          }));
-        }
-        return def.promise;
-      },
-
       _checkboxStatus: function (layerIndex) {
         // get layer
         var layer = this.layers[layerIndex];
@@ -230,16 +206,9 @@ define([
               subNodes: subNodes
             };
             this._nodes[i] = nodesObj;
-            // todo 1.0: kml layers sublayers
+            // todo 1.0: kml layers sublayers. Need to wait for layer to load. :(
             if (layerType === "KML") {
-              this._layerLoaded(layerObject).always(lang.hitch(this, function (evt) {
-                folders = evt.folders;
-
-
-
-
-
-              }));
+              sublayers = layerObject.folders;
             }
             // if we have more than one sublayer and layer is of valid type for sublayers
             if (layerType !== "ArcGISTiledMapServiceLayer" && sublayers && sublayers.length) {
@@ -251,7 +220,13 @@ define([
               for (var j = 0; j < sublayers.length; j++) {
                 // sublayer info
                 var sublayer = sublayers[j];
-                var parentId = sublayer.parentLayerId;
+                var subLayerIndex = sublayer.id;
+                var parentId;
+                if (layerType === "KML") {
+                  parentId = sublayer.parentFolderId;
+                } else {
+                  parentId = sublayer.parentLayerId;
+                }
                 // place sublayers not in the root
                 if (parentId !== -1) {
                   subListNode = domConstruct.create("ul", {
@@ -303,7 +278,7 @@ define([
                   subClear: subClearNode
                 };
                 // add node to array
-                subNodes[j] = subNode;
+                subNodes[subLayerIndex] = subNode;
               }
             }
           }
