@@ -4,6 +4,7 @@ define([
   "dojo/_base/lang",
 
   "dojo/Evented",
+  "dojo/Deferred",
   "dojo/has",
   "dojo/on",
 
@@ -21,7 +22,7 @@ define([
 ],
   function (
     array, declare, lang,
-    Evented, has, on,
+    Evented, Deferred, has, on,
     domClass, domStyle, domConstruct, domAttr,
     _WidgetBase, _TemplatedMixin,
     esriNS,
@@ -129,6 +130,29 @@ define([
       /* ---------------- */
       /* Private Functions */
       /* ---------------- */
+      
+      _layerLoaded: function (layer) {
+        var def = new Deferred();
+        if (layer.loaded) {
+          // nothing to do
+          def.resolve(layer);
+        } else if (layer.loadError) {
+          def.reject(this._error("Layer failed to load."));
+        } else {
+          var loadedEvent, errorEvent;
+          // once layer is loaded
+          loadedEvent = on.once(layer, "load", lang.hitch(this, function () {
+            errorEvent.remove();
+            def.resolve(layer);
+          }));
+          // error occurred loading layer
+          errorEvent = on.once(layer, "error", lang.hitch(this, function () {
+            loadedEvent.remove();
+            def.reject(this._error("Layer could not be loaded."));
+          }));
+        }
+        return def.promise;
+      },
 
       _checkboxStatus: function (layerIndex) {
         // get layer
@@ -151,18 +175,13 @@ define([
         // if we got layers
         if (layers && layers.length) {
           for (var i = 0; i < layers.length; i++) {
-            
-            // todo sublayers for multiple levels.
-            
-            // todo kml layers sublayers
-            
-            
-            var sublayers;
+            var sublayers, folders;
             var layer = layers[i];
             var layerObject = layer.layerObject;
             if (layerObject) {
               // sublayers from thier info
               sublayers = layerObject.layerInfos;
+              folders = layerObject.folders;
             }
             // layer node
             var layerNode = domConstruct.create("li", {
@@ -176,63 +195,6 @@ define([
             // nodes for sublayers
             var subNodes = [];
             var layerType = layer.layerType;
-            // if we have more than one sublayer and layer is of valid type for sublayers
-            if (layerType !== "ArcGISTiledMapServiceLayer" && sublayers && sublayers.length && sublayers.length) {
-              // create sublayer list
-              var subList = domConstruct.create("ul", {
-                className: this.css.subList
-              }, layerNode);
-              // create each sublayer item
-              for (var j = 0; j < sublayers.length; j++) {
-                // sublayer info
-                var sublayer = sublayers[j];
-                // default checked state
-                var subChecked = sublayer.defaultVisibility;
-                // list item node
-                var subLayerNode = domConstruct.create("li", {
-                  className: this.css.subListLayer
-                }, subList);
-                // title of sublayer layer
-                var subTitleNode = domConstruct.create("div", {
-                  className: this.css.title
-                }, subLayerNode);
-                // sublayer title container
-                var subTitleContainerNode = domConstruct.create("div", {
-                  className: this.css.titleContainer
-                }, subTitleNode);
-                // sublayer checkbox
-                var subCheckboxNode = domConstruct.create("input", {
-                  type: "checkbox",
-                  id: this.id + "_checkbox_sub_" + i + "_" + j,
-                  "data-layer-index": i,
-                  "data-sublayer-index": j,
-                  checked: subChecked,
-                  className: this.css.checkbox
-                }, subTitleContainerNode);
-                // sublayer Title text
-                var subTitle = sublayer.name || "";
-                var subLabelNode = domConstruct.create("label", {
-                  for: this.id + "_checkbox_sub_" + i + "_" + j,
-                  className: this.css.label,
-                  textContent: subTitle
-                }, subTitleContainerNode);
-                // sublayer clear css
-                var subClearNode = domConstruct.create("div", {
-                  className: this.css.clear
-                }, subTitleContainerNode);
-                // object of sublayer nodes
-                var subNode = {
-                  subLayer: subLayerNode,
-                  subTitle: subTitleNode,
-                  subTitleContainer: subTitleContainerNode,
-                  subCheckbox: subCheckboxNode,
-                  subLabel: subLabelNode,
-                  subClear: subClearNode
-                };
-                // add node to array
-                subNodes.push(subNode);
-              }
-            }
             // get parent layer checkbox status
             var status = this._checkboxStatus(i);
             // title container
@@ -269,6 +231,75 @@ define([
               subNodes: subNodes
             };
             this._nodes.push(nodesObj);
+            // todo 1.0: kml layers sublayers
+            if(layerType === "KML" && folders && folders.length){
+              console.log(folders);
+            }
+            // if we have more than one sublayer and layer is of valid type for sublayers
+            if (layerType !== "ArcGISTiledMapServiceLayer" && sublayers && sublayers.length) {
+              // create sublayer list
+              var subListNode = domConstruct.create("ul", {
+                className: this.css.subList
+              }, layerNode);
+              // create each sublayer item
+              for (var j = 0; j < sublayers.length; j++) {
+                // sublayer info
+                var sublayer = sublayers[j];
+                var parentId = sublayer.parentLayerId;
+                // place sublayers not in the root
+                if (parentId !== -1) {
+                  subListNode = domConstruct.create("ul", {
+                    className: this.css.subList
+                  }, this._nodes[i].subNodes[parentId].subLayer);
+                }
+                // default checked state
+                var subChecked = sublayer.defaultVisibility;
+                // list item node
+                var subLayerNode = domConstruct.create("li", {
+                  className: this.css.subListLayer
+                }, subListNode);
+                // title of sublayer layer
+                var subTitleNode = domConstruct.create("div", {
+                  className: this.css.title
+                }, subLayerNode);
+                // sublayer title container
+                var subTitleContainerNode = domConstruct.create("div", {
+                  className: this.css.titleContainer
+                }, subTitleNode);
+                // sublayer checkbox
+                var subCheckboxNode = domConstruct.create("input", {
+                  type: "checkbox",
+                  id: this.id + "_checkbox_sub_" + i + "_" + j,
+                  "data-layer-index": i,
+                  "data-sublayer-index": j,
+                  checked: subChecked,
+                  className: this.css.checkbox
+                }, subTitleContainerNode);
+                // sublayer Title text
+                var subTitle = sublayer.name || "";
+                var subLabelNode = domConstruct.create("label", {
+                  for: this.id + "_checkbox_sub_" + i + "_" + j,
+                  className: this.css.label,
+                  textContent: subTitle
+                }, subTitleContainerNode);
+                // sublayer clear css
+                var subClearNode = domConstruct.create("div", {
+                  className: this.css.clear
+                }, subTitleContainerNode);
+                // object of sublayer nodes
+                var subNode = {
+                  subList: subListNode,
+                  subLayer: subLayerNode,
+                  subTitle: subTitleNode,
+                  subTitleContainer: subTitleContainerNode,
+                  subCheckbox: subCheckboxNode,
+                  subLabel: subLabelNode,
+                  subClear: subClearNode
+                };
+                // add node to array
+                subNodes.push(subNode);
+              }
+            }
           }
           this._setLayerEvents();
         }
@@ -328,8 +359,8 @@ define([
           }
         }));
         this._layerEvents.push(visChange);
-        
-        // todo 2.0 out of scale range
+
+        // todo 2.0: out of scale range
         /* 
         // scale visibility changes
         var scaleVisChange = on(layerObject, 'scale-visibility-change', lang.hitch(this, function (evt) {
@@ -347,7 +378,7 @@ define([
         }));
         this._layerEvents.push(scaleVisChange);
         */
-        
+
       },
 
       _layerEvent: function (index) {
@@ -466,8 +497,8 @@ define([
               layerObject.setVisibility(newVis);
             }
           }
-          // todo ? graphics layer support test
-          else if (this._isGraphicsLayer(layer)) {
+          // other layer type
+          else {
             newVis = !layer.visible;
             layer.setVisibility(newVis);
           }
@@ -512,16 +543,6 @@ define([
             this._layerEvent(i);
           }
         }
-      },
-
-      // todo test graphics layer
-      _isGraphicsLayer: function (layer) {
-        var isGl = false;
-        if (layer.url === null && layer.type === undefined) {
-          console.log(layer);
-          isGl = true;
-        }
-        return isGl;
       },
 
       _init: function () {
