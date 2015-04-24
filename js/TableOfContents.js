@@ -155,6 +155,7 @@ define([
       /* Private Functions */
       /* ---------------- */
 
+      // note: done
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
         var layerInfo = layers[layerIndex];
@@ -191,39 +192,44 @@ define([
         return def.promise;
       },
 
+      // note: done
       _checkboxStatus: function (layerInfo) {
+        return layerInfo.visibility || false;
+      },
+
+      // note: done
+      _subCheckboxStatus: function (layerInfo, subLayerInfo) {
         var checked = false;
-        // set checked state
-        if (layerInfo.visibility || layerInfo.visible) {
-          checked = true;
+        switch (layerInfo.layerType) {
+        case "KML":
+          checked = subLayerInfo.visible;
+          break;
+        default:
+          checked = subLayerInfo.defaultVisibility;
         }
         return checked;
       },
 
-      _subCheckboxStatus: function (layerInfo) {
-        var checked = false;
-        // set checked state
-        if (layerInfo.defaultVisibility || layerInfo.visible) {
-          checked = true;
-        }
-        return checked;
-      },
-
-      _getLayerTitle: function (evt) {
+      // note: done
+      _getLayerTitle: function (e) {
         var title = "";
-        if (evt.layerInfo && evt.layerInfo.title) {
-          title = evt.layerInfo.title;
-        } else if (evt.layer && evt.layer.name) {
-          title = evt.layer.name;
-        } else if (evt.layerInfo && evt.layerInfo.id) {
-          title = evt.layerInfo.id;
+        // get best title
+        if (e.layerInfo && e.layerInfo.title) {
+          title = e.layerInfo.title;
+        } else if (e.layer && e.layer.name) {
+          title = e.layer.name;
+        } else if (e.layerInfo && e.layerInfo.id) {
+          title = e.layerInfo.id;
         }
+        // optionally remove underscores
         if (this.removeUnderscores) {
           title = title.replace(/_/g, " ");
         }
         return title;
       },
 
+      // todo 1.0: GeoRSS layers subLayers
+      // todo 1.0: WMS layers subLayers
       _createLayerNodes: function () {
         var loadedLayers = this._loadedLayers;
         // create nodes for each layer
@@ -284,8 +290,7 @@ define([
               };
               this._nodes[layerIndex] = nodesObj;
 
-              // todo 1.0: GeoRSS layers subLayers
-              // todo 1.0: WMS layers subLayers
+
 
               if (layer) {
                 // subLayers from thier info
@@ -320,7 +325,7 @@ define([
                       }, this._nodes[layerIndex].subNodes[parentId].subLayer);
                     }
                     // default checked state
-                    var subChecked = this._subCheckboxStatus(subLayer);
+                    var subChecked = this._subCheckboxStatus(layerInfo, subLayer);
                     // list item node
                     var subLayerNode = domConstruct.create("li", {
                       className: this.css.subListLayer
@@ -373,6 +378,7 @@ define([
         }
       },
 
+      // note: done
       _removeEvents: function () {
         var i;
         // layer visibility events
@@ -384,6 +390,7 @@ define([
         this._layerEvents = [];
       },
 
+      // note: done
       _toggleVisible: function (index, subIndex, visible) {
         // if its a sublayer
         if (subIndex !== null) {
@@ -403,32 +410,30 @@ define([
         });
       },
 
-      _layerVisChangeEvent: function (index, featureCollection, subLayerIndex) {
-        var layers = this.layers;
-        var layer = layers[index];
-        var layerObject;
+      // todo 2.0: out of scale range
+      _layerVisChangeEvent: function (response, featureCollection, subLayerIndex) {
+        var layer;
         // layer is a feature collection
         if (featureCollection) {
           // all subLayers
           var fcLayers = layer.featureCollection.layers;
           // current layer object to setup event for
-          layerObject = fcLayers[subLayerIndex].layerObject;
+          layer = fcLayers[subLayerIndex].layerObject;
         } else {
           // layer object for event
-          layerObject = layer.layerObject;
+          layer = response.layer;
         }
         // layer visibility changes
-        var visChange = on(layerObject, "visibility-change", lang.hitch(this, function (evt) {
+        var visChange = on(layer, "visibility-change", lang.hitch(this, function (evt) {
           if (featureCollection) {
-            this._featureCollectionVisible(index, evt.visible);
+            this._featureCollectionVisible(response.layerIndex, evt.visible);
           } else {
             // update checkbox and layer visibility classes
-            this._toggleVisible(index, null, evt.visible);
+            this._toggleVisible(response.layerIndex, null, evt.visible);
           }
         }));
         this._layerEvents.push(visChange);
 
-        // todo 2.0: out of scale range
         /* 
         // scale visibility changes
         var scaleVisChange = on(layerObject, "scale-visibility-change", lang.hitch(this, function (evt) {
@@ -449,31 +454,33 @@ define([
 
       },
 
-      _layerEvent: function (index) {
-        var layers = this.layers;
-        var layer = layers[index];
-        var layerObject = layer.layerObject;
+      // todo 1.0: visible layers change for other sublayer types
+      _layerEvent: function (response) {
+        // todo 1.0: use layertype throughout
+        var layerInfo = response.layerInfo;
+        var layerIndex = response.layerIndex;
+        var layer = response.layerObject;
         // feature collection events
-        if (layer.featureCollection && layer.featureCollection.layers && layer.featureCollection.layers.length) {
+        if (layerInfo.featureCollection && layerInfo.featureCollection.layers && layerInfo.featureCollection.layers.length) {
           // feature collection layers
-          var fsLayers = layer.featureCollection.layers;
+          var fsLayers = layerInfo.featureCollection.layers;
           if (fsLayers && fsLayers.length) {
             // make event for each layer
             for (var i = 0; i < fsLayers.length; i++) {
               // layer visibility changes
-              this._layerVisChangeEvent(index, true, i);
+              this._layerVisChangeEvent(response, true, i);
             }
           }
         } else {
           // layer visibility changes
-          this._layerVisChangeEvent(index, false, null);
+          this._layerVisChangeEvent(response);
           // if we have a map service
-          if (layer.layerType && layer.layerType === "ArcGISMapServiceLayer") {
-            var subVisChange = on(layerObject, "visible-layers-change", lang.hitch(this, function (evt) {
+          if (layerInfo.layerType && layerInfo.layerType === "ArcGISMapServiceLayer") {
+            var subVisChange = on(layer, "visible-layers-change", lang.hitch(this, function (evt) {
               // new visible layers
               var visibleLayers = evt.visibleLayers;
               // all subLayer info
-              var layerInfos = layerObject.layerInfos;
+              var layerInfos = layer.layerInfos;
               // go through all subLayers
               for (var i = 0; i < layerInfos.length; i++) {
                 var subLayerIndex = layerInfos[i].id;
@@ -482,12 +489,12 @@ define([
                 // not found
                 if (found === -1) {
                   layerInfos[subLayerIndex].defaultVisibility = false;
-                  this._toggleVisible(index, subLayerIndex, false);
+                  this._toggleVisible(layerIndex, subLayerIndex, false);
                 }
                 // found
                 else {
                   layerInfos[subLayerIndex].defaultVisibility = true;
-                  this._toggleVisible(index, subLayerIndex, true);
+                  this._toggleVisible(layerIndex, subLayerIndex, true);
                 }
               }
             }));
@@ -496,6 +503,7 @@ define([
         }
       },
 
+      // todo 1.0: use layertype throughout
       _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
         if (this.layers && this.layers.length) {
@@ -555,10 +563,7 @@ define([
               if (layerObject.setVisibleLayers && typeof layerObject.setVisibleLayers === "function") {
                 layerObject.setVisibleLayers(visibleLayers);
               }
-            }
-
-            // todo use layertype throughout
-            else if (typeof subLayerIndex !== "undefined") {
+            } else if (typeof subLayerIndex !== "undefined") {
 
 
               var folders = layerObject.folders;
@@ -596,6 +601,7 @@ define([
         }
       },
 
+      // note: done
       _featureCollectionVisible: function (index, visible) {
         var layer = this.layers[index];
         // all layers either visible or not
@@ -624,18 +630,21 @@ define([
         }
       },
 
+      // note: done
       _setLayerEvents: function () {
         // this function sets up all the events for layers
-        var layers = this.layers;
+        var layers = this._loadedLayers;
         if (layers && layers.length) {
           // get all layers
           for (var i = 0; i < layers.length; i++) {
+            var response = layers[i];
             // create necessary events
-            this._layerEvent(i);
+            this._layerEvent(response);
           }
         }
       },
 
+      // note: done
       _init: function () {
         this._visible();
         this.refresh().always(lang.hitch(this, function () {
@@ -644,6 +653,7 @@ define([
         }));
       },
 
+      // note: done
       _visible: function () {
         if (this.visible) {
           domStyle.set(this.domNode, "display", "block");
