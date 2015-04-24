@@ -572,7 +572,7 @@ define([
                 var folder = folders[i];
                 if (folder.id === subLayerIndex) {
 
-                  console.log(folder.id, subLayerIndex, folder);
+                  
 
                   layerObject.setFolderVisibility(folder, !folder.visible);
                   break;
