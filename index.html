@@ -82,10 +82,13 @@
             }]
     };
   </script>
-  <script src="http://js.arcgis.com/3.13/" type="text/javascript"></script>
+  <script src="http://jsdev.arcgis.com/3.14/" type="text/javascript"></script>
   <script type="text/javascript">
     var map;
-    require(["dojo/_base/lang", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, Map, TableOfContents, arcgisUtils, on, dom) {
+    require(["dojo/_base/lang", "esri/config", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, esriConfig, Map, TableOfContents, arcgisUtils, on, dom) {
+      
+      esriConfig.defaults.io.proxyUrl = "/proxy/proxy.php";
+      
       // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
       
       // b591577a424242e8ae4667de053c3ffa
@@ -110,6 +113,10 @@
           layers: layers
         }, "TableOfContents");
         myWidget.startup();
+        
+        on(myWidget, 'load', lang.hitch(this, function (evt) {
+          console.log("load", evt);
+        }));
 
         on(myWidget, 'toggle', lang.hitch(this, function (evt) {
           console.log("toggle", evt);
