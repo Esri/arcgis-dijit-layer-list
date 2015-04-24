@@ -283,8 +283,9 @@ define([
                 subNodes: subNodes
               };
               this._nodes[layerIndex] = nodesObj;
-              
+
               // todo 1.0: GeoRSS layers subLayers
+              // todo 1.0: WMS layers subLayers
 
               if (layer) {
                 // subLayers from thier info
@@ -307,6 +308,8 @@ define([
                     var parentId;
                     if (layerType === "KML") {
                       parentId = subLayer.parentFolderId;
+                    } else if (layerType === "WMS") {
+                      parentId = -1;
                     } else {
                       parentId = subLayer.parentLayerId;
                     }
@@ -552,7 +555,10 @@ define([
               if (layerObject.setVisibleLayers && typeof layerObject.setVisibleLayers === "function") {
                 layerObject.setVisibleLayers(visibleLayers);
               }
-            } else if (typeof subLayerIndex !== "undefined") {
+            }
+
+            // todo use layertype throughout
+            else if (typeof subLayerIndex !== "undefined") {
 
 
               var folders = layerObject.folders;
