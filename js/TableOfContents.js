@@ -454,13 +454,12 @@ define([
 
       },
 
-      // todo 1.0: visible layers change for other sublayer types
       _layerEvent: function (response) {
-        // todo 1.0: use layertype throughout
         var layerInfo = response.layerInfo;
+        var layerType = layerInfo.layerType;
         var layerIndex = response.layerIndex;
         var layer = response.layerObject;
-        // feature collection events
+        // feature collection layer
         if (layerInfo.featureCollection && layerInfo.featureCollection.layers && layerInfo.featureCollection.layers.length) {
           // feature collection layers
           var fsLayers = layerInfo.featureCollection.layers;
@@ -475,7 +474,7 @@ define([
           // layer visibility changes
           this._layerVisChangeEvent(response);
           // if we have a map service
-          if (layerInfo.layerType && layerInfo.layerType === "ArcGISMapServiceLayer") {
+          if (layerType === "ArcGISMapServiceLayer") {
             var subVisChange = on(layer, "visible-layers-change", lang.hitch(this, function (evt) {
               // new visible layers
               var visibleLayers = evt.visibleLayers;
@@ -503,46 +502,34 @@ define([
         }
       },
 
-      // todo 1.0: use layertype throughout
       _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
         if (this.layers && this.layers.length) {
           var newVis;
-          var layer = this.layers[layerIndex];
-          var layerObject = layer.layerObject;
-          var featureCollection = layer.featureCollection;
-          var visibleLayers, visibleFolders;
+          var layerInfo = this.layers[layerIndex];
+          var layerType = layerInfo.layerType;
+          var layer = layerInfo.layerObject;
+          var featureCollection = layerInfo.featureCollection;
+          var visibleLayers;
           var i;
           // feature collection layer
           if (featureCollection) {
-            // visible feature layers
-            visibleLayers = layer.visibleLayers;
             // new visibility
-            newVis = !layer.visibility;
+            newVis = !layerInfo.visibility;
             // set visibility for layer reference
-            layer.visibility = newVis;
-            // toggle all feature collection layers
-            if (visibleLayers && visibleLayers.length) {
-              // toggle visible sub layers
-              for (i = 0; i < visibleLayers.length; i++) {
-                layerObject = featureCollection.layers[visibleLayers[i]].layerObject;
-                // toggle to new visibility
-                layerObject.setVisibility(newVis);
-              }
-            } else {
-              // toggle all sub layers
-              for (i = 0; i < featureCollection.layers.length; i++) {
-                layerObject = featureCollection.layers[i].layerObject;
-                // toggle to new visibility
-                layerObject.setVisibility(newVis);
-              }
+            layerInfo.visibility = newVis;
+            // toggle all sub layers
+            for (i = 0; i < featureCollection.layers.length; i++) {
+              var fcLayer = featureCollection.layers[i].layerObject;
+              // toggle to new visibility
+              fcLayer.setVisibility(newVis);
             }
           }
           // layer
-          else if (layerObject) {
-            var layerInfos = layerObject.layerInfos;
-            // setting subLayer visibility
-            if (typeof subLayerIndex !== "undefined" && layerObject.hasOwnProperty("visibleLayers")) {
+          else if (layer) {
+            // Map Service Layer
+            if (typeof subLayerIndex !== "undefined" && layerType === "ArcGISMapServiceLayer") {
+              var layerInfos = layer.layerInfos;
               // array for setting visible layers
               visibleLayers = [-1];
               newVis = !layerInfos[subLayerIndex].defaultVisibility;
@@ -560,43 +547,35 @@ define([
                   }
                 }
               }
-              if (layerObject.setVisibleLayers && typeof layerObject.setVisibleLayers === "function") {
-                layerObject.setVisibleLayers(visibleLayers);
+              if (layer.setVisibleLayers && typeof layer.setVisibleLayers === "function") {
+                layer.setVisibleLayers(visibleLayers);
               }
-            } else if (typeof subLayerIndex !== "undefined") {
-
-
-              var folders = layerObject.folders;
+            }
+            // KML Layer
+            else if (typeof subLayerIndex !== "undefined" && layerType === "KML") {
+              var folders = layer.folders;
               // for each sublayer
               for (i = 0; i < folders.length; i++) {
                 var folder = folders[i];
                 if (folder.id === subLayerIndex) {
-
-                  
-
-                  layerObject.setFolderVisibility(folder, !folder.visible);
+                  layer.setFolderVisibility(folder, !folder.visible);
                   break;
                 }
               }
-
-
-
             }
-
-
             // parent map layer
             else {
               // reverse current visibility of parent layer
-              newVis = !layer.layerObject.visible;
+              newVis = !layer.visible;
               // new visibility of parent layer
-              layer.visibility = newVis;
-              layerObject.setVisibility(newVis);
+              layerInfo.visibility = newVis;
+              layer.setVisibility(newVis);
             }
           }
-          // other layer type
+          // Just layer object
           else {
-            newVis = !layer.visible;
-            layer.setVisibility(newVis);
+            newVis = !layerInfo.visible;
+            layerInfo.setVisibility(newVis);
           }
         }
       },
