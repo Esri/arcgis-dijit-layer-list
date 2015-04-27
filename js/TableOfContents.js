@@ -68,19 +68,13 @@ define([
         var _self = this;
         // when checkbox is clicked
         this.own(on(this._layersNode, "." + this.css.checkbox + ":change", function () {
-          var data, subData, index, subIndex;
+          var data, subData;
           // layer index
           data = domAttr.get(this, "data-layer-index");
-          if (data) {
-            index = parseInt(data, 10);
-          }
           // subLayer index
           subData = domAttr.get(this, "data-sublayer-index");
-          if (subData) {
-            subIndex = parseInt(subData, 10);
-          }
           // toggle layer visibility
-          _self._toggleLayer(index, subIndex);
+          _self._toggleLayer(data, subData);
         }));
       },
 
@@ -155,7 +149,6 @@ define([
       /* Private Functions */
       /* ---------------- */
 
-      // note: done
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
         var layerInfo = layers[layerIndex];
@@ -192,17 +185,31 @@ define([
         return def.promise;
       },
 
-      // note: done
       _checkboxStatus: function (layerInfo) {
         return layerInfo.visibility || false;
       },
 
-      // note: done
+      _WMSVisible: function (layerInfo, subLayerInfo) {
+        var checked = false;
+        var visibleLayers = [];
+        if (layerInfo && layerInfo.layerObject) {
+          visibleLayers = layerInfo.layerObject.visibleLayers;
+        }
+        var found = array.indexOf(visibleLayers, subLayerInfo.name);
+        if (found !== -1) {
+          checked = true;
+        }
+        return checked;
+      },
+
       _subCheckboxStatus: function (layerInfo, subLayerInfo) {
         var checked = false;
         switch (layerInfo.layerType) {
         case "KML":
           checked = subLayerInfo.visible;
+          break;
+        case "WMS":
+          checked = this._WMSVisible(layerInfo, subLayerInfo);
           break;
         default:
           checked = subLayerInfo.defaultVisibility;
@@ -210,7 +217,6 @@ define([
         return checked;
       },
 
-      // note: done
       _getLayerTitle: function (e) {
         var title = "";
         // get best title
@@ -228,8 +234,7 @@ define([
         return title;
       },
 
-      // todo 1.0: GeoRSS layers subLayers
-      // todo 1.0: WMS layers subLayers
+      // todo 2.0: need event for wms sublayer toggles
       _createLayerNodes: function () {
         var loadedLayers = this._loadedLayers;
         // create nodes for each layer
@@ -289,11 +294,8 @@ define([
                 subNodes: subNodes
               };
               this._nodes[layerIndex] = nodesObj;
-
-
-
               if (layer) {
-                // subLayers from thier info
+                // subLayers from thier info. Also WMS layers
                 subLayers = layer.layerInfos;
                 // KML subLayers
                 if (layerType === "KML") {
@@ -309,14 +311,22 @@ define([
                   for (var j = 0; j < subLayers.length; j++) {
                     // subLayer info
                     var subLayer = subLayers[j];
-                    var subLayerIndex = subLayer.id;
-                    var parentId;
-                    if (layerType === "KML") {
-                      parentId = subLayer.parentFolderId;
-                    } else if (layerType === "WMS") {
-                      parentId = -1;
-                    } else {
+                    var subLayerIndex;
+                    var parentId = -1;
+                    // Dynamic Map Service
+                    if (layerType === "ArcGISMapServiceLayer") {
+                      subLayerIndex = subLayer.id;
                       parentId = subLayer.parentLayerId;
+                    }
+                    // KML
+                    else if (layerType === "KML") {
+                      subLayerIndex = subLayer.id;
+                      parentId = subLayer.parentFolderId;
+                    }
+                    // WMS
+                    else if (layerType === "WMS") {
+                      subLayerIndex = subLayer.name;
+                      parentId = -1;
                     }
                     // place subLayers not in the root
                     if (parentId !== -1) {
@@ -378,7 +388,6 @@ define([
         }
       },
 
-      // note: done
       _removeEvents: function () {
         var i;
         // layer visibility events
@@ -390,7 +399,6 @@ define([
         this._layerEvents = [];
       },
 
-      // note: done
       _toggleVisible: function (index, subIndex, visible) {
         // if its a sublayer
         if (subIndex !== null) {
@@ -506,7 +514,7 @@ define([
         // all layers
         if (this.layers && this.layers.length) {
           var newVis;
-          var layerInfo = this.layers[layerIndex];
+          var layerInfo = this.layers[parseInt(layerIndex, 10)];
           var layerType = layerInfo.layerType;
           var layer = layerInfo.layerObject;
           var featureCollection = layerInfo.featureCollection;
@@ -527,40 +535,52 @@ define([
           }
           // layer
           else if (layer) {
-            // Map Service Layer
-            if (typeof subLayerIndex !== "undefined" && layerType === "ArcGISMapServiceLayer") {
-              var layerInfos = layer.layerInfos;
-              // array for setting visible layers
-              visibleLayers = [-1];
-              newVis = !layerInfos[subLayerIndex].defaultVisibility;
-              // reverse current visibility of sublayer
-              layerInfos[subLayerIndex].defaultVisibility = newVis;
-              // for each sublayer
-              for (i = 0; i < layerInfos.length; i++) {
-                var info = layerInfos[i];
-                // push to visible layers if it's visible
-                if (info.defaultVisibility) {
-                  visibleLayers.push(info.id);
-                  var negative = array.lastIndexOf(visibleLayers, -1);
-                  if (negative !== -1) {
-                    visibleLayers.splice(negative, 1);
+            // we're toggling a sublayer
+            if (subLayerIndex !== null) {
+              // Map Service Layer
+              if (layerType === "ArcGISMapServiceLayer") {
+                subLayerIndex = parseInt(subLayerIndex, 10);
+                var layerInfos = layer.layerInfos;
+                // array for setting visible layers
+                visibleLayers = [-1];
+                newVis = !layerInfos[subLayerIndex].defaultVisibility;
+                // reverse current visibility of sublayer
+                layerInfos[subLayerIndex].defaultVisibility = newVis;
+                // for each sublayer
+                for (i = 0; i < layerInfos.length; i++) {
+                  var info = layerInfos[i];
+                  // push to visible layers if it's visible
+                  if (info.defaultVisibility) {
+                    visibleLayers.push(info.id);
+                    var negative = array.lastIndexOf(visibleLayers, -1);
+                    if (negative !== -1) {
+                      visibleLayers.splice(negative, 1);
+                    }
                   }
                 }
-              }
-              if (layer.setVisibleLayers && typeof layer.setVisibleLayers === "function") {
                 layer.setVisibleLayers(visibleLayers);
               }
-            }
-            // KML Layer
-            else if (typeof subLayerIndex !== "undefined" && layerType === "KML") {
-              var folders = layer.folders;
-              // for each sublayer
-              for (i = 0; i < folders.length; i++) {
-                var folder = folders[i];
-                if (folder.id === subLayerIndex) {
-                  layer.setFolderVisibility(folder, !folder.visible);
-                  break;
+              // KML Layer
+              else if (layerType === "KML") {
+                subLayerIndex = parseInt(subLayerIndex, 10);
+                var folders = layer.folders;
+                // for each sublayer
+                for (i = 0; i < folders.length; i++) {
+                  var folder = folders[i];
+                  if (folder.id === subLayerIndex) {
+                    layer.setFolderVisibility(folder, !folder.visible);
+                    break;
+                  }
                 }
+              } else if (layerType === "WMS") {
+                visibleLayers = layer.visibleLayers;
+                var found = array.indexOf(visibleLayers, subLayerIndex);
+                if (found === -1) {
+                  visibleLayers.push(subLayerIndex);
+                } else {
+                  visibleLayers.splice(found, 1);
+                }
+                layer.setVisibleLayers(visibleLayers);
               }
             }
             // parent map layer
@@ -580,7 +600,6 @@ define([
         }
       },
 
-      // note: done
       _featureCollectionVisible: function (index, visible) {
         var layer = this.layers[index];
         // all layers either visible or not
@@ -609,7 +628,6 @@ define([
         }
       },
 
-      // note: done
       _setLayerEvents: function () {
         // this function sets up all the events for layers
         var layers = this._loadedLayers;
@@ -623,7 +641,6 @@ define([
         }
       },
 
-      // note: done
       _init: function () {
         this._visible();
         this.refresh().always(lang.hitch(this, function () {
@@ -632,7 +649,6 @@ define([
         }));
       },
 
-      // note: done
       _visible: function () {
         if (this.visible) {
           domStyle.set(this.domNode, "display", "block");
