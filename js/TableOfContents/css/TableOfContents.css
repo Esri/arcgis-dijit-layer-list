@@ -54,6 +54,10 @@
   padding: 10px 32px 10px 20px;
 }
 
+.TableOfContents .tocScaleInvisible .tocLabel {
+  color: #999;
+}
+
 .TableOfContents .tocCheckbox {
   float: left;
   height: 16px;

@@ -56,6 +56,7 @@ define([
           subList: "tocSubList",
           subListLayer: "tocSubListLayer",
           layer: "tocLayer",
+          layerScaleInvisible: "tocScaleInvisible",
           title: "tocTitle",
           titleContainer: "tocTitleContainer",
           checkbox: "tocCheckbox",
@@ -234,7 +235,6 @@ define([
         return title;
       },
 
-      // todo 2.0: need event for wms sublayer toggles
       _createLayerNodes: function () {
         var loadedLayers = this._loadedLayers;
         // create nodes for each layer
@@ -250,6 +250,10 @@ define([
               var layerNode = domConstruct.create("li", {
                 className: this.css.layer
               });
+              // currently visible layer
+              if (!layer.visibleAtMapScale) {
+                domClass.add(layerNode, this.css.layerScaleInvisible);
+              }
               domConstruct.place(layerNode, this._layersNode, "first");
               // title of layer
               var titleNode = domConstruct.create("div", {
@@ -418,7 +422,7 @@ define([
         });
       },
 
-      // todo 2.0: out of scale range
+      // todo 3.0: out of scale range for sublayers
       _layerVisChangeEvent: function (response, featureCollection, subLayerIndex) {
         var layer;
         // layer is a feature collection
@@ -441,32 +445,21 @@ define([
           }
         }));
         this._layerEvents.push(visChange);
-
-        /* 
-        // scale visibility changes
-        var scaleVisChange = on(layerObject, "scale-visibility-change", lang.hitch(this, function (evt) {
-          var layer = evt.target;
-          var visible = layer.visibleAtMapScale;
-          
-          console.log(layer);
-          
-          if(visible){
-            
-          }
-          else{
-            
-          }
-        }));
-        this._layerEvents.push(scaleVisChange);
-        */
-
+        if (!featureCollection) {
+          // scale visibility changes
+          var scaleVisChange = on(layer, "scale-visibility-change", lang.hitch(this, function (evt) {
+            var visible = evt.target.visibleAtMapScale;
+            domClass.toggle(this._nodes[response.layerIndex].layer, this.css.layerScaleInvisible, !visible);
+          }));
+          this._layerEvents.push(scaleVisChange);
+        }
       },
 
       _layerEvent: function (response) {
         var layerInfo = response.layerInfo;
         var layerType = layerInfo.layerType;
         var layerIndex = response.layerIndex;
-        var layer = response.layerObject;
+        var layer = response.layer;
         // feature collection layer
         if (layerInfo.featureCollection && layerInfo.featureCollection.layers && layerInfo.featureCollection.layers.length) {
           // feature collection layers
@@ -507,6 +500,8 @@ define([
             }));
             this._layerEvents.push(subVisChange);
           }
+          // todo 3.0: need event for wms sublayer toggles
+          // todo 3.0: need event for KML sublayer toggles
         }
       },
 
