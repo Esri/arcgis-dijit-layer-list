@@ -1,0 +1,72 @@
+.TableOfContents .tocList {
+  background-color: #ededed;
+}
+
+.TableOfContents .tocList ul {
+  background-color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.TableOfContents .tocList,
+.TableOfContents .tocLayer,
+.TableOfContents .tocSubList,
+.TableOfContents .tocSubListLayer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.TableOfContents .tocSubList {
+  margin: 0 0 0 12px;
+}
+
+.dj_rtl .TableOfContents .tocSubList {
+  margin: 0 20px 0 0;
+}
+
+.TableOfContents .tocTitle {
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 16px;
+  line-height: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.TableOfContents .tocLayer:first-child .tocTitle {
+  border-top: 1px solid #e0e0e0;
+}
+
+.TableOfContents .tocTitleContainer {
+  background: #f8f8f8;
+  color: #555;
+  position: relative;
+  zoom: 1;
+}
+
+.TableOfContents .tocLabel {
+  display: block;
+  padding: 10px 20px 10px 32px;
+  margin: 0;
+}
+
+.dj_rtl .TableOfContents .tocLabel {
+  padding: 10px 32px 10px 20px;
+}
+
+.TableOfContents .tocCheckbox {
+  float: left;
+  height: 16px;
+  width: 16px;
+  padding: 0;
+  margin: 12px 5px 12px 10px;
+}
+
+.dj_rtl .TableOfContents .tocCheckbox {
+  float: right;
+  margin: 12px 10px 12px 5px;
+}
+
+.tocClear {
+  clear: both;
+}
