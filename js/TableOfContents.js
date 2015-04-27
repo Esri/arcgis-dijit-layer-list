@@ -318,7 +318,6 @@ define([
                     var subLayer = subLayers[j];
                     var subLayerIndex;
                     var parentId = -1;
-                    var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
                     // Dynamic Map Service
                     if (layerType === "ArcGISMapServiceLayer") {
                       subLayerIndex = subLayer.id;
@@ -342,6 +341,7 @@ define([
                     }
                     // default checked state
                     var subChecked = this._subCheckboxStatus(layerInfo, subLayer);
+                    var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
                     // list item node
                     var subLayerNode = domConstruct.create("li", {
                       className: this.css.subListLayer
