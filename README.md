@@ -1,9 +1,11 @@
 # TOC Widget
 
 ## Features
-The TableOfContents widget provides a table of contents that allows the toggling of layer visibility.  The style can be completely changed and skinned to match your own map design.
+The TableOfContents widget provides a table of contents that allows the toggling of layer visibility. The style can be completely changed and skinned to match your own map design.
 
-This widget does not support toggling individual sublayers (i.e. `visibleLayers` of dynamic map service).
+### Known Issues
+- Out of scale range for sublayers not supported.
+- Toggling of KML and WMS sublayers outside of the widget is not supported.
 
 [View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
 
@@ -49,6 +51,7 @@ TableOfContents(options, srcNode);
 |map|x|Map|null|ArcGIS JS Map|
 |layers|x|Array|null|Array of layers|
 |visible||Boolean|true|Show the widget|
+|removeUnderscores||Boolean|true|Removes underscores from the layer title|
 
 #### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
@@ -73,6 +76,8 @@ This is what the layers array should look like. It follows the response from a w
 |layers|Array|Array of layers|
 |visible|Boolean|Show the widget|
 |loaded|Boolean|If the widget has been loaded.|
+|removeUnderscores||Boolean|Removes underscores from the layer title|
+
 
 ## Methods
 ### startup
