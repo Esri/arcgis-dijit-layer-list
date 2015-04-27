@@ -269,7 +269,6 @@ define([
                 className: this.css.titleContainer
               }, titleNode);
               var id = this.id + "_checkbox_" + layerIndex;
-              alert(id);
               // Title checkbox
               var checkboxNode = domConstruct.create("input", {
                 type: "checkbox",
