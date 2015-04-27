@@ -84,21 +84,21 @@
   </script>
   <script src="http://jsdev.arcgis.com/3.14/" type="text/javascript"></script>
   <script type="text/javascript">
-    var map;
-    require(["dojo/_base/lang", "esri/config", "esri/map", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, esriConfig, Map, TableOfContents, arcgisUtils, on, dom) {
-      
+    var map, myWidget;
+    require(["dojo/_base/lang", "esri/config", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, esriConfig, TableOfContents, arcgisUtils, on, dom) {
+
       esriConfig.defaults.io.proxyUrl = "/proxy/proxy.php";
-      
+
       // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
-      
+
       // b591577a424242e8ae4667de053c3ffa - csv layer
 
       // df8bcc10430f48878b01c96e907a1fc3 - wildfire
-      
+
       // c46382e26f81477ca0046d376b2989fa - georss
-      
+
       // e90e7933b68a43988b04fe800d0330ba - wms
-      
+
       //arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
 
       arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
@@ -109,15 +109,13 @@
       }).then(lang.hitch(this, function (response) {
         map = response.map;
         var layers = response.itemInfo.itemData.operationalLayers;
-
-        console.log(layers);
-
+        
         myWidget = new TableOfContents({
           map: map,
           layers: layers
         }, "TableOfContents");
         myWidget.startup();
-        
+
         on(myWidget, 'load', lang.hitch(this, function (evt) {
           console.log("load", evt);
         }));
@@ -134,8 +132,6 @@
         on(dom.byId('visible_form'), 'change', lang.hitch(this, function (evt) {
           myWidget.set("visible", evt.target.checked);
         }));
-
-
 
 
       }), lang.hitch(this, function (error) {

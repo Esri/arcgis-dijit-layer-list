@@ -268,10 +268,12 @@ define([
               var titleContainerNode = domConstruct.create("div", {
                 className: this.css.titleContainer
               }, titleNode);
+              var id = this.id + "_checkbox_" + layerIndex;
+              alert(id);
               // Title checkbox
               var checkboxNode = domConstruct.create("input", {
                 type: "checkbox",
-                id: this.id + "_checkbox_" + layerIndex,
+                id: id,
                 "data-layer-index": layerIndex,
                 checked: status,
                 className: this.css.checkbox
@@ -279,7 +281,7 @@ define([
               // Title text
               var title = this._getLayerTitle(response);
               var labelNode = domConstruct.create("label", {
-                for: this.id + "_checkbox_" + layerIndex,
+                for: id,
                 className: this.css.label,
                 textContent: title
               }, titleContainerNode);
@@ -317,6 +319,7 @@ define([
                     var subLayer = subLayers[j];
                     var subLayerIndex;
                     var parentId = -1;
+                    var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
                     // Dynamic Map Service
                     if (layerType === "ArcGISMapServiceLayer") {
                       subLayerIndex = subLayer.id;
@@ -355,7 +358,7 @@ define([
                     // subLayer checkbox
                     var subCheckboxNode = domConstruct.create("input", {
                       type: "checkbox",
-                      id: this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex,
+                      id: subId,
                       "data-layer-index": layerIndex,
                       "data-sublayer-index": subLayerIndex,
                       checked: subChecked,
@@ -364,7 +367,7 @@ define([
                     // subLayer Title text
                     var subTitle = subLayer.name || "";
                     var subLabelNode = domConstruct.create("label", {
-                      for: this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex,
+                      for: subId,
                       className: this.css.label,
                       textContent: subTitle
                     }, subTitleContainerNode);
