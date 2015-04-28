@@ -5,7 +5,6 @@ define([
 
   "dojo/Evented",
   "dojo/Deferred",
-  "dojo/has",
   "dojo/on",
 
   "dojo/dom-class",
@@ -16,20 +15,19 @@ define([
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
 
-  "esri/kernel",
   "esri/promiseList",
 
   "dojo/text!./TableOfContents/templates/TableOfContents.html"
 ],
   function (
     array, declare, lang,
-    Evented, Deferred, has, on,
+    Evented, Deferred, on,
     domClass, domStyle, domConstruct, domAttr,
     _WidgetBase, _TemplatedMixin,
-    esriNS, promiseList,
+    promiseList,
     dijitTemplate
   ) {
-    var Widget = declare("esri.dijit.TableOfContents", [_WidgetBase, _TemplatedMixin, Evented], {
+    return declare([_WidgetBase, _TemplatedMixin, Evented], {
 
       templateString: dijitTemplate,
 
@@ -684,8 +682,5 @@ define([
       }
 
     });
-    if (has("extend-esri")) {
-      lang.setObject("dijit.TableOfContents", Widget, esriNS);
-    }
-    return Widget;
+
   });
