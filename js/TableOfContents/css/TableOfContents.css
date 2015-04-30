@@ -28,20 +28,12 @@
   border-bottom: 1px solid #e0e0e0;
   font-size: 16px;
   line-height: 20px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+  background-color: #f8f8f8;
+  color: #555;
 }
 
 .TableOfContents .tocLayer:first-child .tocTitle {
   border-top: 1px solid #e0e0e0;
-}
-
-.TableOfContents .tocTitleContainer {
-  background: #f8f8f8;
-  color: #555;
-  position: relative;
-  zoom: 1;
 }
 
 .TableOfContents .tocLabel {
@@ -69,6 +61,25 @@
 .dj_rtl .TableOfContents .tocCheckbox {
   float: right;
   margin: 12px 10px 12px 5px;
+}
+
+.TableOfContents .tocSettings {
+  float: right;
+  margin: 0 11px 0 0;
+  padding: 10px;
+}
+
+.TableOfContents .tocCustomContent {
+  margin: 0 20px 5px 32px;
+}
+
+.dj_rtl .TableOfContents .tocCustomContent {
+  margin: 0 32px 5px 20px;
+}
+
+.dj_rtl .TableOfContents .tocSettings {
+  float: left;
+  margin: 0 0 0 11px;
 }
 
 .tocClear {

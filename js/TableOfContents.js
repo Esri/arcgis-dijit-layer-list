@@ -59,6 +59,10 @@ define([
           titleContainer: "tocTitleContainer",
           checkbox: "tocCheckbox",
           label: "tocLabel",
+          settings: "tocSettings",
+          settingsIcon: "esriIconSettings2",
+          icon: "esriIcon",
+          customContent: "tocCustomContent",
           clear: "tocClear"
         };
       },
@@ -79,18 +83,17 @@ define([
 
       // start widget. called by user
       startup: function () {
-        // map not defined
-        if (!this.map) {
-          console.error("TableOfContents::map required");
-          return;
-        }
-        // when map is loaded
-        if (this.map.loaded) {
-          this._init();
-        } else {
-          on.once(this.map, "load", lang.hitch(this, function () {
+        if (this.map) {
+          // when map is loaded
+          if (this.map.loaded) {
             this._init();
-          }));
+          } else {
+            on.once(this.map, "load", lang.hitch(this, function () {
+              this._init();
+            }));
+          }
+        } else {
+          this._init();
         }
       },
 
@@ -151,7 +154,12 @@ define([
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
         var layerInfo = layers[layerIndex];
-        var layer = this.map.getLayer(layerInfo.id);
+        var layer;
+        if (this.map) {
+          layer = this.map.getLayer(layerInfo.id);
+        } else {
+          layer = layerInfo.layerObject || layerInfo;
+        }
         // returned event
         var evt = {
           layer: layer,
@@ -275,6 +283,13 @@ define([
                 checked: status,
                 className: this.css.checkbox
               }, titleContainerNode);
+              // optional settings icon
+              if (layerInfo.settingsId) {
+                var settingsNode = domConstruct.create("div", {
+                  id: layerInfo.settingsId,
+                  className: this.css.icon + " " + this.css.settingsIcon + " " + this.css.settings,
+                }, titleContainerNode);
+              }
               // Title text
               var title = this._getLayerTitle(response);
               var labelNode = domConstruct.create("label", {
@@ -286,6 +301,13 @@ define([
               var clearNode = domConstruct.create("div", {
                 className: this.css.clear
               }, titleContainerNode);
+              // optional custom content
+              if (layerInfo.customContentId) {
+                var customContentNode = domConstruct.create("div", {
+                  id: layerInfo.customContentId,
+                  className: this.css.customContent
+                }, titleNode);
+              }
               // lets save all the nodes for events
               var nodesObj = {
                 checkbox: checkboxNode,
