@@ -284,8 +284,9 @@ define([
                 className: this.css.checkbox
               }, titleContainerNode);
               // optional settings icon
+              var settingsNode;
               if (layerInfo.settingsId) {
-                var settingsNode = domConstruct.create("div", {
+                settingsNode = domConstruct.create("div", {
                   id: layerInfo.settingsId,
                   className: this.css.icon + " " + this.css.settingsIcon + " " + this.css.settings,
                 }, titleContainerNode);
@@ -302,8 +303,9 @@ define([
                 className: this.css.clear
               }, titleContainerNode);
               // optional custom content
+              var customContentNode;
               if (layerInfo.customContentId) {
-                var customContentNode = domConstruct.create("div", {
+                customContentNode = domConstruct.create("div", {
                   id: layerInfo.customContentId,
                   className: this.css.customContent
                 }, titleNode);
@@ -316,6 +318,8 @@ define([
                 label: labelNode,
                 layer: layerNode,
                 clear: clearNode,
+                settings: settingsNode,
+                customContent: customContentNode,
                 subNodes: subNodes
               };
               this._nodes[layerIndex] = nodesObj;
