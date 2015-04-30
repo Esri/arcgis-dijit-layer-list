@@ -110,11 +110,31 @@
         map = response.map;
         var layers = response.itemInfo.itemData.operationalLayers;
         
+        var first = layers.length - 1;
+        // Add id for custom settings button
+        layers[first].settingsId = "myCustomSettings";
+        
+        // add id for custom content div
+        layers[first].customContentId = "myCustomContent";
+        
+
         myWidget = new TableOfContents({
           map: map,
           layers: layers
         }, "TableOfContents");
         myWidget.startup();
+
+        var customInfo = dom.byId("myCustomContent");
+        if (customInfo) {
+          customInfo.innerHTML = "<a href=\"#\">Sign in</a>";
+        }
+
+        var customSettings = dom.byId("myCustomSettings");
+        if (customSettings) {
+          on(customSettings, "click", function () {
+            alert("hello");
+          });
+        }
 
         on(myWidget, 'load', lang.hitch(this, function (evt) {
           console.log("load", evt);
