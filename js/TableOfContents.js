@@ -35,6 +35,7 @@ define([
         theme: "TableOfContents",
         map: null,
         layers: null,
+        subLayers: true,
         removeUnderscores: true,
         visible: true
       },
@@ -331,7 +332,7 @@ define([
                   subLayers = layer.folders;
                 }
                 // if we have more than one subLayer and layer is of valid type for subLayers
-                if (layerType !== "ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+                if (this.subLayers && layerType !== "ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
                   // create subLayer list
                   var subListNode = domConstruct.create("ul", {
                     className: this.css.subList
@@ -501,7 +502,7 @@ define([
           // layer visibility changes
           this._layerVisChangeEvent(response);
           // if we have a map service
-          if (layerType === "ArcGISMapServiceLayer") {
+          if (this.subLayers && layerType === "ArcGISMapServiceLayer") {
             var subVisChange = on(layer, "visible-layers-change", lang.hitch(this, function (evt) {
               // new visible layers
               var visibleLayers = evt.visibleLayers;

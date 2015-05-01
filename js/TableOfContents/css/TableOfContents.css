@@ -70,6 +70,12 @@
   font-size: 16px;
   line-height: 20px;
   cursor: pointer;
+  color: #999;
+}
+
+.TableOfContents .tocSettings:hover,
+.TableOfContents .tocSettings:active {
+  color: #333;
 }
 
 .TableOfContents .tocCustomContent {
