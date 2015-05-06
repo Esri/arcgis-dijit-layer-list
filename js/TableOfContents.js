@@ -88,16 +88,14 @@ define([
           // when map is loaded
           if (this.map.loaded) {
             this._init();
-            this._setMapEvents();
           } else {
             on.once(this.map, "load", lang.hitch(this, function () {
               this._init();
-              this._setMapEvents();
             }));
           }
         } else {
           this._init();
-          
+
         }
       },
 
@@ -434,15 +432,14 @@ define([
       },
 
       _setMapEvents: function () {
-           var thisControl = this;
-           this.map.on("layer-add", function (addedLayer) {
-               thisControl.refresh();
-           });
-          this.map.on("layer-remove", function (removedlayer) {
-              thisControl.refresh();
-           });
+        this.own(this.map.on("layer-add", lang.hitch(this, function (addedLayer) {
+          this.refresh();
+        })));
+        this.own(this.map.on("layer-remove", lang.hitch(this, function (removedlayer) {
+          this.refresh();
+        })));
       },
-          
+
       _toggleVisible: function (index, subIndex, visible) {
         // if its a sublayer
         if (subIndex !== null) {
@@ -677,6 +674,7 @@ define([
       },
 
       _init: function () {
+        this._setMapEvents();
         this._visible();
         this.refresh().always(lang.hitch(this, function () {
           this.set("loaded", true);
