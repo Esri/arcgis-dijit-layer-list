@@ -104,9 +104,9 @@ refresh(): reload all layers and properties that may have changed.
 	on(widget, 'toggle', function(evt){…})
 #### Event Object
 	{
-		layerIndex: <Integer>,
-		subLayerIndex: <Integer>,
-		visible: <Boolean>
+	layerIndex: Integer,
+	subLayerIndex: Integer,
+	visible: Boolean
 	}
 
 
