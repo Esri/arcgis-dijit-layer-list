@@ -78,18 +78,32 @@
       packages: [{
         name: "application",
         location: package_path + '/js'
-            }]
+      }]
     };
   </script>
   <script src="http://jsdev.arcgis.com/3.14/" type="text/javascript"></script>
   <script type="text/javascript">
     var map, myWidget;
-    require(["dojo/_base/lang", "esri/config", "application/TableOfContents", "esri/arcgis/utils", "dojo/on", "dojo/dom"], function (lang, esriConfig, TableOfContents, arcgisUtils, on, dom) {
+    require([
+      "dojo/_base/lang",
+      "esri/config",
+      "application/TableOfContents",
+      "esri/arcgis/utils",
+      "dojo/on",
+      "dojo/dom"
+    ], function (
+      lang,
+      esriConfig,
+      TableOfContents,
+      arcgisUtils,
+      on,
+      dom
+    ) {
 
-      
+
       // esriConfig.defaults.io.proxyUrl = "/proxy/proxy.php";
-      
-      
+
+
       /* Sample apps */
 
       // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
@@ -103,9 +117,9 @@
       // e90e7933b68a43988b04fe800d0330ba - wms
 
       //arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
-      
-      
-      
+
+
+
       /* Create webmap */
 
       arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
@@ -115,34 +129,38 @@
         }
       }).then(lang.hitch(this, function (response) {
         map = response.map;
-        
+
 
         var layers = response.itemInfo.itemData.operationalLayers;
-        
-        
+
+
         /* Optionally add settings icon and custom content to first layer */
         var first = layers.length - 1;
         // Add id for custom settings button
         layers[first].settingsId = "myCustomSettings";
         // add id for custom content div
         layers[first].customContentId = "myCustomContent";
-        
+
 
         /* Create widget */
-        
+
         myWidget = new TableOfContents({
           map: map,
           layers: layers
         }, "TableOfContents");
-        myWidget.startup();
-        
-        
+
+
+
         /* These are some test events */
 
         on(myWidget, 'load', lang.hitch(this, function (evt) {
           console.log("load", evt);
-          
-          
+        }));
+
+        on(myWidget, 'refresh', lang.hitch(this, function (evt) {
+
+          console.log('test');
+
           var customInfo = dom.byId("myCustomContent");
           if (customInfo) {
             customInfo.innerHTML = "<a href=\"#\">Sign in</a>";
@@ -154,8 +172,6 @@
               alert("hello world.");
             });
           }
-          
-          
         }));
 
         on(myWidget, 'toggle', lang.hitch(this, function (evt) {
@@ -170,6 +186,9 @@
         on(dom.byId('visible_form'), 'change', lang.hitch(this, function (evt) {
           myWidget.set("visible", evt.target.checked);
         }));
+
+
+        myWidget.startup();
 
 
       }), lang.hitch(this, function (error) {

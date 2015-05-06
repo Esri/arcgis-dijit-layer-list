@@ -144,6 +144,7 @@ define([
           this._loadedLayers = response;
           this._createLayerNodes();
           this._setLayerEvents();
+          this.emit("refresh", {});
         }));
         // return promise
         return pL;
@@ -432,10 +433,10 @@ define([
       },
 
       _setMapEvents: function () {
-        this.own(this.map.on("layer-add", lang.hitch(this, function () {
+        this.own(on(this.map, "layer-add", lang.hitch(this, function () {
           this.refresh();
         })));
-        this.own(this.map.on("layer-remove", lang.hitch(this, function () {
+        this.own(on(this.map, "layer-remove", lang.hitch(this, function () {
           this.refresh();
         })));
       },
@@ -674,8 +675,8 @@ define([
       },
 
       _init: function () {
-        this._setMapEvents();
         this._visible();
+        this._setMapEvents();
         this.refresh().always(lang.hitch(this, function () {
           this.set("loaded", true);
           this.emit("load", {});

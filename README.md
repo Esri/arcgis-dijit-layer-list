@@ -102,6 +102,15 @@ refresh(): reload all layers and properties that may have changed.
 {}
 ```
 
+### refresh
+#### Example
+	on(widget, 'refresh', function(evt){…})
+#### Event Object
+
+``` javascript
+{}
+```
+
 ### toggle
 #### Example
 	on(widget, 'toggle', function(evt){…})
