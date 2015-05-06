@@ -88,13 +88,16 @@ define([
           // when map is loaded
           if (this.map.loaded) {
             this._init();
+            this._setMapEvents();
           } else {
             on.once(this.map, "load", lang.hitch(this, function () {
               this._init();
+              this._setMapEvents();
             }));
           }
         } else {
           this._init();
+          
         }
       },
 
@@ -430,6 +433,16 @@ define([
         this._layerEvents = [];
       },
 
+      _setMapEvents: function () {
+           var thisControl = this;
+           this.map.on("layer-add", function (addedLayer) {
+               thisControl.refresh();
+           });
+          this.map.on("layer-remove", function (removedlayer) {
+              thisControl.refresh();
+           });
+      },
+          
       _toggleVisible: function (index, subIndex, visible) {
         // if its a sublayer
         if (subIndex !== null) {
