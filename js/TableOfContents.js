@@ -432,10 +432,10 @@ define([
       },
 
       _setMapEvents: function () {
-        this.own(this.map.on("layer-add", lang.hitch(this, function (addedLayer) {
+        this.own(this.map.on("layer-add", lang.hitch(this, function () {
           this.refresh();
         })));
-        this.own(this.map.on("layer-remove", lang.hitch(this, function (removedlayer) {
+        this.own(this.map.on("layer-remove", lang.hitch(this, function () {
           this.refresh();
         })));
       },
