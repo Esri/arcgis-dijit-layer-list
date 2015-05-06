@@ -56,17 +56,18 @@ TableOfContents(options, srcNode);
 #### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
 
-	layers = [
-    	{
-     	   layer: LayerObject
-    	    defaultSymbol: Symbol
-    	    title: String
-    	},
-    	{
-    		...
-    	}
-	];
-
+``` javascript
+layers = [
+    {
+        layer: LayerObject
+        defaultSymbol: Symbol
+        title: String
+    },
+    {
+    	...
+    }
+];
+```
 
 ## Properties
 |property|type|description|
@@ -96,19 +97,22 @@ refresh(): reload all layers and properties that may have changed.
 #### Example
 	on(widget, 'load', function(evt){…})
 #### Event Object
-	{}
 
+``` javascript
+{}
+```
 
 ### toggle
 #### Example
 	on(widget, 'toggle', function(evt){…})
 #### Event Object
-	{
+``` javascript
+{
 	layerIndex: Integer,
 	subLayerIndex: Integer,
 	visible: Boolean
-	}
-
+}
+```
 
 
 ## Requirements
