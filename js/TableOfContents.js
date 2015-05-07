@@ -283,9 +283,9 @@ define([
                 type: "checkbox",
                 id: id,
                 "data-layer-index": layerIndex,
-                checked: status,
                 className: this.css.checkbox
               }, titleContainerNode);
+              domAttr.set(checkboxNode, "checked", status);
               // optional settings icon
               var settingsNode;
               if (layerInfo.settingsId) {
@@ -387,9 +387,9 @@ define([
                       id: subId,
                       "data-layer-index": layerIndex,
                       "data-sublayer-index": subLayerIndex,
-                      checked: subChecked,
                       className: this.css.checkbox
                     }, subTitleContainerNode);
+                    domAttr.set(subCheckboxNode, "checked", subChecked);
                     // subLayer Title text
                     var subTitle = subLayer.name || "";
                     var subLabelNode = domConstruct.create("label", {
