@@ -675,8 +675,8 @@ define([
 
       _init: function () {
         this._visible();
-        this._setMapEvents();
         this.refresh().always(lang.hitch(this, function () {
+          this._setMapEvents();
           this.set("loaded", true);
           this.emit("load", {});
         }));
