@@ -10,7 +10,11 @@ The TableOfContents widget provides a table of contents that allows the toggling
 [View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
 
 ## Quickstart
-	var map = response.map;
+
+Layers need to match the [ArcGIS Webmap JSON Spec](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/Web_map_data/02qt0000000q000000/) for [operational layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/).
+
+```javascript
+var map = response.map;
     var layers = response.itemInfo.itemData.operationalLayers;
 
     myWidget = new TableOfContents({
@@ -18,6 +22,7 @@ The TableOfContents widget provides a table of contents that allows the toggling
       layers: layers
     }, "TableOfContents");
     myWidget.startup();
+```
 
  [New to Github? Get started here.](https://github.com/)
 
