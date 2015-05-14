@@ -590,6 +590,7 @@ define([
                     }
                   }
                 }
+                /*
                 //Now that the array of visibleLayer IDs is assembled,
                 //strip off IDs of invisible child layers, and
                 //IDs of group layers (group layer IDs should not be submitted 
@@ -610,7 +611,12 @@ define([
                     no_groups.push(no_invisible_parents[j]);
                   }
                 }
+                if(!no_groups.length){
+                  no_groups = [-1]; 
+                }
                 layer.setVisibleLayers(no_groups);
+                */
+                layer.setVisibleLayers(visibleLayers);
               }
               // KML Layer
               else if (layerType === "KML") {
@@ -693,6 +699,7 @@ define([
         }
       },
 
+      /*
       _allIDsPresent: function (layerObject, layerID, arrayOfIDs) {
         //Returns false if any IDs are not present in the supplied array of IDs.
         var parentIds = this._walkUpLayerIDs(layerObject, layerID);
@@ -739,6 +746,7 @@ define([
         }
         return info;
       },
+      */
 
       _init: function () {
         this._visible();
