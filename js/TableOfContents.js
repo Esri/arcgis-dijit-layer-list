@@ -705,18 +705,6 @@ define([
         return true;
       },
 
-      _hasVisibleParents: function (layerObject, layerID) {
-        //Returns false if any parents are not visible in map.
-        var parentIds = this._walkUpLayerIDs(layerObject, layerID);
-        //If any of the parents are NOT in the list of visible layers return false:
-        for (var i = 0; i < parentIds.length; i++) {
-          if (array.indexOf(layerObject.visibleLayers, parentIds[i]) === -1) {
-            return false;
-          }
-        }
-        return true;
-      },
-
       _walkUpLayerIDs: function (layerObject, layerID) {
         //returns array of layerIDs of all parents of layerID
         var layerInfo = this._getLayerInfo(layerObject, layerID);
