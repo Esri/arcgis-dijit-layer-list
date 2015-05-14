@@ -603,24 +603,24 @@ define([
                 //Remove layers whos parents are not visible:
                 var no_invisible_parents = []
                 for (var i=0;i<visibleLayers.length;i++){
-									var id = visibleLayers[i];
-									var hasParentsInVisibleArray = this._allIDsPresent(layer, id, visibleLayers);
-									if(hasParentsInVisibleArray){
-										no_invisible_parents.push(id);
-									}
+		  var id = visibleLayers[i];
+		  var hasParentsInVisibleArray = this._allIDsPresent(layer, id, visibleLayers);
+		  if(hasParentsInVisibleArray){
+		    no_invisible_parents.push(id);
+		  }
                 }                
                 
 									
-								var no_groups = [];
-								for (var j =0;j<no_invisible_parents.length;j++){
+		var no_groups = [];
+		for (var j =0;j<no_invisible_parents.length;j++){
                   var info = this._getLayerInfo(layer,no_invisible_parents[j]);
                   if (info.subLayerIds != null){
                    //This is a group layer, skip it.   
                   }
                   else {
                     no_groups.push(no_invisible_parents[j]);
-								  }
-								}
+		  }
+		}
 //                console.log("previous enabled layers:" );
 //                console.log(layer.visibleLayers);
 //                console.log("no invisible parents layers:" );
