@@ -242,7 +242,6 @@ define([
       },
 
       _createLayerNodes: function () {
-        //console.log("creating layer nodes...");
         // clear node
         this._layersNode.innerHTML = "";
         var loadedLayers = this._loadedLayers;
@@ -251,7 +250,6 @@ define([
           var response = loadedLayers[i];
           if (response) {
             var layer = response.layer;
-              console.log(layer);
             var layerIndex = response.layerIndex;
             var layerInfo = response.layerInfo;
             if (layerInfo) {
@@ -286,9 +284,7 @@ define([
                 "data-layer-index": layerIndex,
                 className: this.css.checkbox
               }, titleContainerNode);
-                
               domAttr.set(checkboxNode, "checked", status);
-                
               // optional settings icon
               var settingsNode;
               if (layerInfo.settingsId) {
@@ -594,40 +590,27 @@ define([
                     }
                   }
                 }
-                  
                 //Now that the array of visibleLayer IDs is assembled,
                 //strip off IDs of invisible child layers, and
                 //IDs of group layers (group layer IDs should not be submitted 
                 //in .setVisible() or loss of toggle control madness ensues.
-                  
                 //Remove layers whos parents are not visible:
-                var no_invisible_parents = []
-                for (var i=0;i<visibleLayers.length;i++){
-		  var id = visibleLayers[i];
-		  var hasParentsInVisibleArray = this._allIDsPresent(layer, id, visibleLayers);
-		  if(hasParentsInVisibleArray){
-		    no_invisible_parents.push(id);
-		  }
-                }                
-                
-									
-		var no_groups = [];
-		for (var j =0;j<no_invisible_parents.length;j++){
-                  var info = this._getLayerInfo(layer,no_invisible_parents[j]);
-                  if (info.subLayerIds != null){
-                   //This is a group layer, skip it.   
+                var no_invisible_parents = [];
+                for (i = 0; i < visibleLayers.length; i++) {
+                  var id = visibleLayers[i];
+                  var hasParentsInVisibleArray = this._allIDsPresent(layer, id, visibleLayers);
+                  if (hasParentsInVisibleArray) {
+                    no_invisible_parents.push(id);
                   }
-                  else {
+                }
+                var no_groups = [];
+                for (var j = 0; j < no_invisible_parents.length; j++) {
+                  var lyrInfo = this._getLayerInfo(layer, no_invisible_parents[j]);
+                  if (lyrInfo && lyrInfo.subLayerIds === null) {
                     no_groups.push(no_invisible_parents[j]);
-		  }
-		}
-//                console.log("previous enabled layers:" );
-//                console.log(layer.visibleLayers);
-//                console.log("no invisible parents layers:" );
-//                console.log(no_invisible_parents);
-//                console.log("no group layers:" );
-//                console.log(no_groups);
-                  layer.setVisibleLayers(no_groups);                  
+                  }
+                }
+                layer.setVisibleLayers(no_groups);
               }
               // KML Layer
               else if (layerType === "KML") {
@@ -709,67 +692,66 @@ define([
           }
         }
       },
-      _allIDsPresent: function (layerObject, layerID, arrayOfIDs){
+
+      _allIDsPresent: function (layerObject, layerID, arrayOfIDs) {
         //Returns false if any IDs are not present in the supplied array of IDs.
         var parentIds = this._walkUpLayerIDs(layerObject, layerID);
-
         //If any of the parentIDs are NOT in the arrayOfIDs return false:
-        for (var i=0;i<parentIds.length;i++){
-          if (array.indexOf(arrayOfIDs, parentIds[i])==-1){
-//            console.log("parent of : " + layerID + " is not present in array, do not enable.");
-            return false;   
+        for (var i = 0; i < parentIds.length; i++) {
+          if (array.indexOf(arrayOfIDs, parentIds[i]) === -1) {
+            return false;
           }
-        }          
+        }
         return true;
       },
-      _hasVisibleParents: function (layerObject, layerID){
+
+      _hasVisibleParents: function (layerObject, layerID) {
         //Returns false if any parents are not visible in map.
-          var parentIds = this._walkUpLayerIDs(layerObject, layerID);
-          
-          //If any of the parents are NOT in the list of visible layers return false:
-          for (var i=0;i<parentIds.length;i++){
-            if (array.indexOf(layerObject.visibleLayers, parentIds[i])==-1){
-              console.log("parent of : " + layerID + " is not visible, do not enable.");
-              return false;   
-            }
-          }          
-          return true;
+        var parentIds = this._walkUpLayerIDs(layerObject, layerID);
+        //If any of the parents are NOT in the list of visible layers return false:
+        for (var i = 0; i < parentIds.length; i++) {
+          if (array.indexOf(layerObject.visibleLayers, parentIds[i]) === -1) {
+            return false;
+          }
+        }
+        return true;
       },
-      _walkUpLayerIDs: function (layerObject, layerID){
+
+      _walkUpLayerIDs: function (layerObject, layerID) {
         //returns array of layerIDs of all parents of layerID
-          
         var layerInfo = this._getLayerInfo(layerObject, layerID);
         var parentLayerInfo;
         var parentLayerIDs = [];
-        var done = false;
-        while (!done){
+        if (layerInfo) {
           //If the current layerInfo layerInfo doesn't have a parent,
           //then we're at the top of the hierarchy and should return the result.
-          if(layerInfo.parentLayerId == -1){
-              done = true;    //Probably just a break would do here.
-          }
-          else{
+          while (layerInfo.parentLayerId !== -1) {
             //A parent exists, save the info and add to the array:
             parentLayerInfo = this._getLayerInfo(layerObject, layerInfo.parentLayerId);
-            parentLayerIDs.push(parentLayerInfo.id);
+            if (parentLayerInfo) {
+              parentLayerIDs.push(parentLayerInfo.id);
+            }
+            //Move up hierarchy: reassign the layerInfo to the parent. Loop.
+            layerInfo = parentLayerInfo;
           }
+        }
+        return parentLayerIDs;
+      },
 
-          //Move up hierarchy: reassign the layerInfo to the parent. Loop.
-          layerInfo = parentLayerInfo;
-        }        
-          return parentLayerIDs;
-      },
-      _getLayerInfo: function (layerObject, layerID){
-         //Get the layerInfo for layerID from the layerObject:
+      _getLayerInfo: function (layerObject, layerID) {
+        //Get the layerInfo for layerID from the layerObject:
         var info;
-        for (var i=0;i<layerObject.layerInfos.length;i++){
-            info = layerObject.layerInfos[i];
-         if (info.id == layerID){
-             //we have our desired layerInfo.
-             return info;               
-         }
-        }         
+        for (var i = 0; i < layerObject.layerInfos.length; i++) {
+          var layerInfo = layerObject.layerInfos[i];
+          if (layerInfo.id === layerID) {
+            //we have our desired layerInfo.
+            info = layerInfo;
+            break;
+          }
+        }
+        return info;
       },
+
       _init: function () {
         this._visible();
         this.refresh().always(lang.hitch(this, function () {
