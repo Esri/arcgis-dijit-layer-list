@@ -4,14 +4,13 @@
 The TableOfContents widget provides a table of contents that allows the toggling of layer visibility. The style can be completely changed and skinned to match your own map design.
 
 ### Purpose
-- This widget is meant to be simple.
-- This widget isn't for configuration. It's general purpose is for the end user to toggle layer visibility.
+- This widget is meant to be simple. It's general purpose is for the end user to toggle layer visibility.
 - A legend isn't included along side each layer. Use the legend widget for displaying information about the layers.
 - There are options to specify a "settingsId" or "customContentId" which will create nodes with these Ids within the widget. These nodes will allow you to do your app's configuration of the layer or put custom content, like a transperency slider, underneath the layer's title.
 
 ### Known Issues
+- Toggling of Mapservice, KML and WMS sublayers outside of the widget is not supported.
 - Out of scale range for sublayers not supported.
-- Toggling of KML and WMS sublayers outside of the widget is not supported.
 
 [View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
 
