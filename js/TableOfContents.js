@@ -494,9 +494,6 @@ define([
 
       _layerEvent: function (response) {
         var layerInfo = response.layerInfo;
-        var layerType = layerInfo.layerType;
-        var layerIndex = response.layerIndex;
-        var layer = response.layer;
         // feature collection layer
         if (layerInfo.featureCollection && layerInfo.featureCollection.layers && layerInfo.featureCollection.layers.length) {
           // feature collection layers
@@ -511,32 +508,7 @@ define([
         } else {
           // layer visibility changes
           this._layerVisChangeEvent(response);
-          // if we have a map service
-          if (this.subLayers && layerType === "ArcGISMapServiceLayer") {
-            var subVisChange = on(layer, "visible-layers-change", lang.hitch(this, function (evt) {
-              // new visible layers
-              var visibleLayers = evt.visibleLayers;
-              // all subLayer info
-              var layerInfos = layer.layerInfos;
-              // go through all subLayers
-              for (var i = 0; i < layerInfos.length; i++) {
-                var subLayerIndex = layerInfos[i].id;
-                // is subLayer in visible layers array
-                var found = array.indexOf(visibleLayers, subLayerIndex);
-                // not found
-                if (found === -1) {
-                  layerInfos[subLayerIndex].defaultVisibility = false;
-                  this._toggleVisible(layerIndex, subLayerIndex, false);
-                }
-                // found
-                else {
-                  layerInfos[subLayerIndex].defaultVisibility = true;
-                  this._toggleVisible(layerIndex, subLayerIndex, true);
-                }
-              }
-            }));
-            this._layerEvents.push(subVisChange);
-          }
+          // todo 3.0: need to figure out way to support togglling map service sublayers outside of widget
           // todo 3.0: need event for wms sublayer toggles
           // todo 3.0: need event for KML sublayer toggles
         }
@@ -590,7 +562,6 @@ define([
                     }
                   }
                 }
-                /*
                 //Now that the array of visibleLayer IDs is assembled,
                 //strip off IDs of invisible child layers, and
                 //IDs of group layers (group layer IDs should not be submitted 
@@ -611,12 +582,12 @@ define([
                     no_groups.push(no_invisible_parents[j]);
                   }
                 }
-                if(!no_groups.length){
-                  no_groups = [-1]; 
+                // note: set -1 if array is empty.
+                if (!no_groups.length) {
+                  no_groups = [-1];
                 }
+                // set visible sublayers which are not grouped
                 layer.setVisibleLayers(no_groups);
-                */
-                layer.setVisibleLayers(visibleLayers);
               }
               // KML Layer
               else if (layerType === "KML") {
@@ -699,7 +670,6 @@ define([
         }
       },
 
-      /*
       _allIDsPresent: function (layerObject, layerID, arrayOfIDs) {
         //Returns false if any IDs are not present in the supplied array of IDs.
         var parentIds = this._walkUpLayerIDs(layerObject, layerID);
@@ -746,7 +716,6 @@ define([
         }
         return info;
       },
-      */
 
       _init: function () {
         this._visible();
