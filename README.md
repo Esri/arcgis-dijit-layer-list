@@ -62,6 +62,7 @@ TableOfContents(options, srcNode);
 |layers|x|Object[]|null|[Operational Layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/)|
 |visible||Boolean|true|Show the widget|
 |removeUnderscores||Boolean|true|Removes underscores from the layer title|
+|subLayers||Boolean|true|Show sublayers in the list of layers|
 
 #### Layers Object
 This is what the layers array should look like. It follows the response from a webmap's operational layers.
