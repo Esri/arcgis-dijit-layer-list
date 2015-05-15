@@ -59,7 +59,7 @@ TableOfContents(options, srcNode);
 |---|---|---|---|---|
 |theme||string|TableOfContents|CSS Class for uniquely styling the widget.|
 |map|x|Map|null|ArcGIS JS Map|
-|layers|x|Array|null|Array of layers|
+|layers|x|Array|null|[Operational Layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/)|
 |visible||Boolean|true|Show the widget|
 |removeUnderscores||Boolean|true|Removes underscores from the layer title|
 
