@@ -1,3 +1,12 @@
+/*
+TODO
+  create new branch for this
+  Option to just supply map:
+    - Create layerInfos from map layers
+  need function that gets layers from webmap
+  need to test with non webmap map
+  Rename to "LayerList"
+*/
 define([
   "dojo/_base/array",
   "dojo/_base/declare",
@@ -154,12 +163,7 @@ define([
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
         var layerInfo = layers[layerIndex];
-        var layer;
-        if (this.map) {
-          layer = this.map.getLayer(layerInfo.id);
-        } else {
-          layer = layerInfo.layerObject || layerInfo;
-        }
+        var layer = layerInfo.layerObject;
         // returned event
         var evt = {
           layer: layer,
@@ -211,11 +215,12 @@ define([
 
       _subCheckboxStatus: function (layerInfo, subLayerInfo) {
         var checked = false;
-        switch (layerInfo.layerType) {
-        case "KML":
+        var layerType = layerInfo.layerObject.declaredClass;
+        switch (layerType) {
+        case "esri.layers.KMLLayer":
           checked = subLayerInfo.visible;
           break;
-        case "WMS":
+        case "esri.layers.WMSLayer":
           checked = this._WMSVisible(layerInfo, subLayerInfo);
           break;
         default:
@@ -229,10 +234,14 @@ define([
         // get best title
         if (e.layerInfo && e.layerInfo.title) {
           title = e.layerInfo.title;
+        } else if (e.layer && e.layer.arcgisProps && e.layer.arcgisProps.title) {
+          title = e.layer.arcgisProps.title;
         } else if (e.layer && e.layer.name) {
           title = e.layer.name;
         } else if (e.layerInfo && e.layerInfo.id) {
           title = e.layerInfo.id;
+        } else if (e.layer && e.layer.id) {
+          title = e.layer.id;
         }
         // optionally remove underscores
         if (this.removeUnderscores) {
@@ -269,7 +278,7 @@ define([
               }, layerNode);
               // nodes for subLayers
               var subNodes = [];
-              var layerType = layerInfo.layerType;
+              var layerType = layer.declaredClass;
               // get parent layer checkbox status
               var status = this._checkboxStatus(layerInfo);
               // title container
@@ -329,11 +338,11 @@ define([
                 // subLayers from thier info. Also WMS layers
                 subLayers = layer.layerInfos;
                 // KML subLayers
-                if (layerType === "KML") {
+                if (layerType === "esri.layers.KMLLayer") {
                   subLayers = layer.folders;
                 }
                 // if we have more than one subLayer and layer is of valid type for subLayers
-                if (this.subLayers && layerType !== "ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+                if (this.subLayers && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
                   // create subLayer list
                   var subListNode = domConstruct.create("ul", {
                     className: this.css.subList
@@ -345,17 +354,17 @@ define([
                     var subLayerIndex;
                     var parentId = -1;
                     // Dynamic Map Service
-                    if (layerType === "ArcGISMapServiceLayer") {
+                    if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
                       subLayerIndex = subLayer.id;
                       parentId = subLayer.parentLayerId;
                     }
                     // KML
-                    else if (layerType === "KML") {
+                    else if (layerType === "esri.layers.KMLLayer") {
                       subLayerIndex = subLayer.id;
                       parentId = subLayer.parentFolderId;
                     }
                     // WMS
-                    else if (layerType === "WMS") {
+                    else if (layerType === "esri.layers.WMSLayer") {
                       subLayerIndex = subLayer.name;
                       parentId = -1;
                     }
@@ -519,8 +528,8 @@ define([
         if (this.layers && this.layers.length) {
           var newVis;
           var layerInfo = this.layers[parseInt(layerIndex, 10)];
-          var layerType = layerInfo.layerType;
           var layer = layerInfo.layerObject;
+          var layerType = layer.declaredClass;
           var featureCollection = layerInfo.featureCollection;
           var visibleLayers;
           var i;
@@ -542,7 +551,7 @@ define([
             // we're toggling a sublayer
             if (subLayerIndex !== null) {
               // Map Service Layer
-              if (layerType === "ArcGISMapServiceLayer") {
+              if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
                 subLayerIndex = parseInt(subLayerIndex, 10);
                 var layerInfos = layer.layerInfos;
                 // array for setting visible layers
@@ -590,7 +599,7 @@ define([
                 layer.setVisibleLayers(no_groups);
               }
               // KML Layer
-              else if (layerType === "KML") {
+              else if (layerType === "esri.layers.KMLLayer") {
                 subLayerIndex = parseInt(subLayerIndex, 10);
                 var folders = layer.folders;
                 // for each sublayer
@@ -601,7 +610,7 @@ define([
                     break;
                   }
                 }
-              } else if (layerType === "WMS") {
+              } else if (layerType === "esri.layers.WMSLayer") {
                 visibleLayers = layer.visibleLayers;
                 var found = array.indexOf(visibleLayers, subLayerIndex);
                 if (found === -1) {
@@ -717,8 +726,54 @@ define([
         return info;
       },
 
+      _isSupportedLayerType: function (layer) {
+        if (layer) {
+          if (layer._basemapGalleryLayerType && layer._basemapGalleryLayerType === "basemap") {
+            return false;
+          } else {
+            return true;
+          }
+        }
+        return false;
+      },
+
+      _createLayerInfo: function (layer) {
+        return {
+          // todo
+          // enableSublayers (bool or array of sublayers to show?)
+          // settings button node
+          // custom content node
+          id: layer.id,
+          visibility: layer.visible,
+          layerObject: layer
+        };
+      },
+
+      _updateAllMapLayers: function () {
+        if (!this.layers || !this.layers.length) {
+          var layers = [];
+          // get all non graphic layers
+          array.forEach(this.map.layerIds, function (layerId) {
+            var layer = this.map.getLayer(layerId);
+            if (this._isSupportedLayerType(layer)) {
+              layers.push(this._createLayerInfo(layer));
+            }
+          }, this);
+          // get all graphic layers
+          array.forEach(this.map.graphicsLayerIds, function (layerId) {
+            var layer = this.map.getLayer(layerId);
+            // check drawMode so we don't include layers created for pop-ups        
+            if (this._isSupportedLayerType(layer) && layer._params && layer._params.drawMode) {
+              layers.push(this._createLayerInfo(layer));
+            }
+          }, this);
+          this._set("layers", layers);
+        }
+      },
+
       _init: function () {
         this._visible();
+        this._updateAllMapLayers();
         this.refresh().always(lang.hitch(this, function () {
           this._setMapEvents();
           this.set("loaded", true);

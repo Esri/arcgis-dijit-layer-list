@@ -133,8 +133,11 @@
         map = response.map;
 
 
-        var layers = response.itemInfo.itemData.operationalLayers;
+        //var layers = response.itemInfo.itemData.operationalLayers;
 
+        var layers = arcgisUtils.getLegendLayers(response);
+        
+        console.log(layers);
 
         /* Optionally add settings icon and custom content to first layer */
         var first = layers.length - 1;
@@ -144,11 +147,13 @@
         layers[first].customContentId = "myCustomContent";
 
 
+        console.log("webmap layers:", layers);
+        
         /* Create widget */
 
         myWidget = new TableOfContents({
           map: map,
-          layers: layers
+          //layers: layers
         }, "TableOfContents");
 
 
