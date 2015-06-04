@@ -90,39 +90,64 @@
       "application/TableOfContents",
       "esri/arcgis/utils",
       "dojo/on",
-      "dojo/dom"
+      "dojo/dom",
+      "esri/map",
+      "esri/layers/ArcGISDynamicMapServiceLayer"
     ], function (
       lang,
       esriConfig,
       TableOfContents,
       arcgisUtils,
       on,
-      dom
+      dom,
+      Map,
+      ArcGISDynamicMapServiceLayer
     ) {
 
 
-      // esriConfig.defaults.io.proxyUrl = "/proxy/proxy.php";
+      // RUN DIRECT MAP SERVICE
+      // var map = new Map("map", {
+      //     basemap: "topo",  
+      //     center: [-122.45, 37.75], 
+      //     zoom: 13
+      // });
+      //   //Takes a URL to a non cached map service.
+      //   var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", {
+      //     "opacity" : 0.5        
+      //   });
+      //   map.addLayer(dynamicMapServiceLayer);   
+      //       myWidget = new TableOfContents({
+      //         map: map,
+      //         layers: map._layers
+      //       }, "TableOfContents");
+      //   myWidget.startup();
+      // END RUN DIRECT MAP SERVICE
 
 
-      /* Sample apps */
 
-      // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
+      // RUN WEBMAP 
+      // // esriConfig.defaults.io.proxyUrl = "/proxy/proxy.php";
 
-      // b591577a424242e8ae4667de053c3ffa - csv layer
 
-      // df8bcc10430f48878b01c96e907a1fc3 - wildfire
+      // /* Sample apps */
 
-      // c46382e26f81477ca0046d376b2989fa - georss
+      // // 62c2a1a6ac8f4329b34d3dcf7ad47099 - devext
 
-      // e90e7933b68a43988b04fe800d0330ba - wms
+      // // b591577a424242e8ae4667de053c3ffa - csv layer
+
+      // // df8bcc10430f48878b01c96e907a1fc3 - wildfire
+
+      // // c46382e26f81477ca0046d376b2989fa - georss
+
+      // // e90e7933b68a43988b04fe800d0330ba - wms
       
-      // 72748e2e531f400cbe5a7560f768bdb8 - federal lands
+      // // 72748e2e531f400cbe5a7560f768bdb8 - federal lands
 
-      // arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
+      // // arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
 
 
 
-      /* Create webmap */
+      // /* Create webmap */
 
       arcgisUtils.createMap('df8bcc10430f48878b01c96e907a1fc3', "map", {
         mapOptions: {
@@ -204,6 +229,9 @@
           alert("Unable to create map: " + error.message);
         }
       }));
+      // END RUN WEBMAP 
+
+
     });
   </script>
 </body>
