@@ -1,11 +1,11 @@
 /*
 TODO
-  create new branch for this
-  Option to just supply map:
-    - Create layerInfos from map layers
-  need function that gets layers from webmap
+  need function that gets layers from webmap response
   need to test with non webmap map
   Rename to "LayerList"
+  enableSublayers per each layer info (bool or array of sublayers to show?)
+  settings button node per each layer info
+  custom content node per each layer info
 */
 define([
   "dojo/_base/array",
@@ -739,10 +739,6 @@ define([
 
       _createLayerInfo: function (layer) {
         return {
-          // todo
-          // enableSublayers (bool or array of sublayers to show?)
-          // settings button node
-          // custom content node
           id: layer.id,
           visibility: layer.visible,
           layerObject: layer
