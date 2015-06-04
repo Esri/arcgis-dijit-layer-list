@@ -353,6 +353,7 @@ define([
                     var subLayer = subLayers[j];
                     var subLayerIndex;
                     var parentId = -1;
+                    var subSubListNode = null;
                     // Dynamic Map Service
                     if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
                       subLayerIndex = subLayer.id;
@@ -370,7 +371,7 @@ define([
                     }
                     // place subLayers not in the root
                     if (parentId !== -1) {
-                      subListNode = domConstruct.create("ul", {
+                      subSubListNode = domConstruct.create("ul", {
                         className: this.css.subList
                       }, this._nodes[layerIndex].subNodes[parentId].subLayer);
                     }
@@ -380,7 +381,7 @@ define([
                     // list item node
                     var subLayerNode = domConstruct.create("li", {
                       className: this.css.subListLayer
-                    }, subListNode);
+                    }, subSubListNode || subListNode);
                     // title of subLayer layer
                     var subTitleNode = domConstruct.create("div", {
                       className: this.css.title
@@ -411,7 +412,7 @@ define([
                     }, subTitleContainerNode);
                     // object of subLayer nodes
                     var subNode = {
-                      subList: subListNode,
+                      subList: subSubListNode,
                       subLayer: subLayerNode,
                       subTitle: subTitleNode,
                       subTitleContainer: subTitleContainerNode,
