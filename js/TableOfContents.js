@@ -412,7 +412,8 @@ define([
                     }, subTitleContainerNode);
                     // object of subLayer nodes
                     var subNode = {
-                      subList: subSubListNode,
+                      subList: subListNode,
+                      subSubList: subSubListNode,
                       subLayer: subLayerNode,
                       subTitle: subTitleNode,
                       subTitleContainer: subTitleContainerNode,
