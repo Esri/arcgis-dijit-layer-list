@@ -125,6 +125,7 @@ define([
 
       refresh: function () {
         // all layer info
+         this.layers = this.get("map").getLayersVisibleAtScale();
         var layers = this.layers;
         // store nodes here
         this._nodes = [];
@@ -271,7 +272,8 @@ define([
               var subNodes = [];
               var layerType = layerInfo.layerType;
               // get parent layer checkbox status
-              var status = this._checkboxStatus(layerInfo);
+              var status = this._serviceLayerCheckboxStatus(layer);
+              //var status = this._checkboxStatus(layerInfo);
               // title container
               var titleContainerNode = domConstruct.create("div", {
                 className: this.css.titleContainer
@@ -359,6 +361,10 @@ define([
                     else if (layerType === "WMS") {
                       subLayerIndex = subLayer.name;
                       parentId = -1;
+                    }
+                    else { 
+                      subLayerIndex = subLayer.id;
+                      parentId = subLayer.parentLayerId;
                     }
                     // place subLayers not in the root
                     if (parentId !== -1) {
@@ -523,6 +529,9 @@ define([
           var layerInfo = this.layers[parseInt(layerIndex, 10)];
           var layerType = layerInfo.layerType;
           var layer = layerInfo.layerObject;
+          if(layer===undefined){
+            layer = layerInfo;
+          }
           var featureCollection = layerInfo.featureCollection;
           var visibleLayers;
           var i;
@@ -544,7 +553,7 @@ define([
             // we're toggling a sublayer
             if (subLayerIndex !== null) {
               // Map Service Layer
-              if (layerType === "ArcGISMapServiceLayer") {
+              if (layerType === "ArcGISMapServiceLayer" || layerType == undefined) {
                 subLayerIndex = parseInt(subLayerIndex, 10);
                 var layerInfos = layer.layerInfos;
                 // array for setting visible layers
@@ -657,6 +666,10 @@ define([
         if (equal) {
           this._toggleVisible(index, null, visible);
         }
+      },
+
+      _serviceLayerCheckboxStatus: function (layer) {
+        return layer.visible || false;
       },
 
       _setLayerEvents: function () {
