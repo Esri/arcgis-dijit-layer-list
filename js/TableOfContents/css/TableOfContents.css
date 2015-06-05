@@ -60,7 +60,7 @@
   margin: 12px 10px 12px 5px;
 }
 
-.TableOfContents .tocSettings {
+.TableOfContents .tocButton {
   float: right;
   margin: 0 11px 0 0;
   padding: 10px;
@@ -70,20 +70,20 @@
   color: #999;
 }
 
-.TableOfContents .tocSettings:hover,
-.TableOfContents .tocSettings:active {
+.TableOfContents .tocButton:hover,
+.TableOfContents .tocButton:active {
   color: #333;
 }
 
-.TableOfContents .tocCustomContent {
+.TableOfContents .tocContent {
   margin: 0 20px 5px 32px;
 }
 
-.dj_rtl .TableOfContents .tocCustomContent {
+.dj_rtl .TableOfContents .tocContent {
   margin: 0 32px 5px 20px;
 }
 
-.dj_rtl .TableOfContents .tocSettings {
+.dj_rtl .TableOfContents .tocButton {
   float: left;
   margin: 0 0 0 11px;
 }

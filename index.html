@@ -90,14 +90,15 @@
       "application/TableOfContents",
       "esri/arcgis/utils",
       "dojo/on",
-      "dojo/dom"
+      "dojo/dom",
+      "dojo/dom-construct"
     ], function (
       lang,
       esriConfig,
       TableOfContents,
       arcgisUtils,
       on,
-      dom
+      dom, domConstruct
     ) {
 
 
@@ -115,7 +116,7 @@
       // c46382e26f81477ca0046d376b2989fa - georss
 
       // e90e7933b68a43988b04fe800d0330ba - wms
-      
+
       // 72748e2e531f400cbe5a7560f768bdb8 - federal lands
 
       // arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
@@ -132,53 +133,42 @@
       }).then(lang.hitch(this, function (response) {
         map = response.map;
 
-
-        //var layers = response.itemInfo.itemData.operationalLayers;
-
         var layers = arcgisUtils.getLegendLayers(response);
-        
-        console.log(layers);
+
+        // turn off sublayers for a specific layer
+        //layers[1].sublayers = false;
 
         /* Optionally add settings icon and custom content to first layer */
         var first = layers.length - 1;
-        // Add id for custom settings button
-        layers[first].settingsId = "myCustomSettings";
-        // add id for custom content div
-        layers[first].customContentId = "myCustomContent";
+        var firstLayer = layers[first];
+
+        // optional button
+        firstLayer.button = domConstruct.create("div", {
+          className: "esriIcon esriIconSettings2"
+        });
+        on(firstLayer.button, "click", function () {
+          alert("hello world.");
+        });
 
 
-        console.log("webmap layers:", layers);
-        
+        // custom content
+        firstLayer.content = domConstruct.create("div", {
+          innerHTML: "Here is some custom content."
+        });
+
+
+
         /* Create widget */
-
         myWidget = new TableOfContents({
           map: map,
-          //layers: layers
+          layers: layers
         }, "TableOfContents");
-
+        myWidget.startup();
 
 
         /* These are some test events */
-
         on(myWidget, 'load', lang.hitch(this, function (evt) {
           console.log("load", evt);
-        }));
-
-        on(myWidget, 'refresh', lang.hitch(this, function (evt) {
-
-          console.log('refreshed');
-
-          var customInfo = dom.byId("myCustomContent");
-          if (customInfo) {
-            customInfo.innerHTML = "<a href=\"#\">Sign in</a>";
-          }
-
-          var customSettings = dom.byId("myCustomSettings");
-          if (customSettings) {
-            on(customSettings, "click", function () {
-              alert("hello world.");
-            });
-          }
         }));
 
         on(myWidget, 'toggle', lang.hitch(this, function (evt) {
@@ -186,6 +176,8 @@
         }));
 
 
+
+        /* Demo page events */
         on(dom.byId('theme_form'), 'keyup', lang.hitch(this, function (evt) {
           myWidget.set("theme", evt.target.value);
         }));
@@ -195,7 +187,7 @@
         }));
 
 
-        myWidget.startup();
+
 
 
       }), lang.hitch(this, function (error) {

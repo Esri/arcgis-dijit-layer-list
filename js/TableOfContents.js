@@ -1,8 +1,5 @@
 /*
 TODO
-  Add option to layer info for enabling/disabling sublayers on the layer.
-  Add option to layer info for a node for a button. (appears on title line).
-  Add option to layer info for a content node for custom content (appears below title).
   Rename widget to "LayerList".
   Test with webmaps and non webmaps.
 */
@@ -68,10 +65,8 @@ define([
           titleContainer: "tocTitleContainer",
           checkbox: "tocCheckbox",
           label: "tocLabel",
-          settings: "tocSettings",
-          settingsIcon: "esriIconSettings2",
-          icon: "esriIcon",
-          customContent: "tocCustomContent",
+          button: "tocButton",
+          content: "tocContent",
           clear: "tocClear"
         };
       },
@@ -162,7 +157,7 @@ define([
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
         var layerInfo = layers[layerIndex];
-        var layer = layerInfo.layerObject;
+        var layer = layerInfo.layer;
         // returned event
         var evt = {
           layer: layer,
@@ -202,8 +197,8 @@ define([
       _WMSVisible: function (layerInfo, subLayerInfo) {
         var checked = false;
         var visibleLayers = [];
-        if (layerInfo && layerInfo.layerObject) {
-          visibleLayers = layerInfo.layerObject.visibleLayers;
+        if (layerInfo && layerInfo.layer) {
+          visibleLayers = layerInfo.layer.visibleLayers;
         }
         var found = array.indexOf(visibleLayers, subLayerInfo.name);
         if (found !== -1) {
@@ -214,7 +209,7 @@ define([
 
       _subCheckboxStatus: function (layerInfo, subLayerInfo) {
         var checked = false;
-        var layerType = layerInfo.layerObject.declaredClass;
+        var layerType = layerInfo.layer.declaredClass;
         switch (layerType) {
         case "esri.layers.KMLLayer":
           checked = subLayerInfo.visible;
@@ -249,6 +244,14 @@ define([
         return title;
       },
 
+      _showSublayers: function (layerInfo) {
+        if (layerInfo.hasOwnProperty("sublayers")) {
+          return layerInfo.sublayers;
+        } else {
+          return this.sublayers;
+        }
+      },
+
       _createLayerNodes: function () {
         // clear node
         this._layersNode.innerHTML = "";
@@ -261,6 +264,14 @@ define([
             var layerIndex = response.layerIndex;
             var layerInfo = response.layerInfo;
             if (layerInfo) {
+              // set visibility on layer info if not set
+              if (!layerInfo.hasOwnProperty("visibility")) {
+                layerInfo.visibility = layerInfo.layer.visible;
+              }
+              // set layer info id
+              if (!layerInfo.hasOwnProperty("id")) {
+                layerInfo.id = layerInfo.layer.id;
+              }
               var subLayers;
               // layer node
               var layerNode = domConstruct.create("li", {
@@ -293,13 +304,13 @@ define([
                 className: this.css.checkbox
               }, titleContainerNode);
               domAttr.set(checkboxNode, "checked", status);
-              // optional settings icon
-              var settingsNode;
-              if (layerInfo.settingsId) {
-                settingsNode = domConstruct.create("div", {
-                  id: layerInfo.settingsId,
-                  className: this.css.icon + " " + this.css.settingsIcon + " " + this.css.settings
+              // optional button icon
+              var buttonNode;
+              if (layerInfo.button) {
+                buttonNode = domConstruct.create("div", {
+                  className: this.css.button
                 }, titleContainerNode);
+                domConstruct.place(layerInfo.button, buttonNode);
               }
               // Title text
               var title = this._getLayerTitle(response);
@@ -313,12 +324,12 @@ define([
                 className: this.css.clear
               }, titleContainerNode);
               // optional custom content
-              var customContentNode;
-              if (layerInfo.customContentId) {
-                customContentNode = domConstruct.create("div", {
-                  id: layerInfo.customContentId,
-                  className: this.css.customContent
+              var contentNode;
+              if (layerInfo.content) {
+                contentNode = domConstruct.create("div", {
+                  className: this.css.content
                 }, titleNode);
+                domConstruct.place(layerInfo.content, contentNode);
               }
               // lets save all the nodes for events
               var nodesObj = {
@@ -328,8 +339,8 @@ define([
                 label: labelNode,
                 layer: layerNode,
                 clear: clearNode,
-                settings: settingsNode,
-                customContent: customContentNode,
+                button: buttonNode,
+                content: contentNode,
                 subNodes: subNodes
               };
               this._nodes[layerIndex] = nodesObj;
@@ -341,7 +352,7 @@ define([
                   subLayers = layer.folders;
                 }
                 // if we have more than one subLayer and layer is of valid type for subLayers
-                if (this.subLayers && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+                if (this._showSublayers(layerInfo) && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
                   // create subLayer list
                   var subListNode = domConstruct.create("ul", {
                     className: this.css.subList
@@ -477,7 +488,7 @@ define([
           // all subLayers
           var fcLayers = response.layerInfo.featureCollection.layers;
           // current layer object to setup event for
-          layer = fcLayers[subLayerIndex].layerObject;
+          layer = fcLayers[subLayerIndex].layer;
         } else {
           // layer object for event
           layer = response.layer;
@@ -529,7 +540,7 @@ define([
         if (this.layers && this.layers.length) {
           var newVis;
           var layerInfo = this.layers[parseInt(layerIndex, 10)];
-          var layer = layerInfo.layerObject;
+          var layer = layerInfo.layer;
           var layerType = layer.declaredClass;
           var featureCollection = layerInfo.featureCollection;
           var visibleLayers;
@@ -542,7 +553,7 @@ define([
             layerInfo.visibility = newVis;
             // toggle all sub layers
             for (i = 0; i < featureCollection.layers.length; i++) {
-              var fcLayer = featureCollection.layers[i].layerObject;
+              var fcLayer = featureCollection.layers[i].layer;
               // toggle to new visibility
               fcLayer.setVisibility(newVis);
             }
@@ -652,13 +663,13 @@ define([
           // check if all layers have same visibility
           equal = array.every(visibleLayers, function (item) {
             // check if current layer has same as first layer
-            return layers[item].layerObject.visible === visible;
+            return layers[item].layer.visible === visible;
           });
         } else {
           // check if all layers have same visibility
           equal = array.every(layers, function (item) {
             // check if current layer has same as first layer
-            return item.layerObject.visible === visible;
+            return item.layer.visible === visible;
           });
         }
         // all are the same
@@ -680,9 +691,9 @@ define([
         }
       },
 
-      _allIDsPresent: function (layerObject, layerID, arrayOfIDs) {
+      _allIDsPresent: function (layer, layerID, arrayOfIDs) {
         //Returns false if any IDs are not present in the supplied array of IDs.
-        var parentIds = this._walkUpLayerIDs(layerObject, layerID);
+        var parentIds = this._walkUpLayerIDs(layer, layerID);
         //If any of the parentIDs are NOT in the arrayOfIDs return false:
         for (var i = 0; i < parentIds.length; i++) {
           if (array.indexOf(arrayOfIDs, parentIds[i]) === -1) {
@@ -692,9 +703,9 @@ define([
         return true;
       },
 
-      _walkUpLayerIDs: function (layerObject, layerID) {
+      _walkUpLayerIDs: function (layer, layerID) {
         //returns array of layerIDs of all parents of layerID
-        var layerInfo = this._getLayerInfo(layerObject, layerID);
+        var layerInfo = this._getLayerInfo(layer, layerID);
         var parentLayerInfo;
         var parentLayerIDs = [];
         if (layerInfo) {
@@ -702,7 +713,7 @@ define([
           //then we're at the top of the hierarchy and should return the result.
           while (layerInfo.parentLayerId !== -1) {
             //A parent exists, save the info and add to the array:
-            parentLayerInfo = this._getLayerInfo(layerObject, layerInfo.parentLayerId);
+            parentLayerInfo = this._getLayerInfo(layer, layerInfo.parentLayerId);
             if (parentLayerInfo) {
               parentLayerIDs.push(parentLayerInfo.id);
             }
@@ -713,11 +724,11 @@ define([
         return parentLayerIDs;
       },
 
-      _getLayerInfo: function (layerObject, layerID) {
-        //Get the layerInfo for layerID from the layerObject:
+      _getLayerInfo: function (layer, layerID) {
+        //Get the layerInfo for layerID from the layer:
         var info;
-        for (var i = 0; i < layerObject.layerInfos.length; i++) {
-          var layerInfo = layerObject.layerInfos[i];
+        for (var i = 0; i < layer.layerInfos.length; i++) {
+          var layerInfo = layer.layerInfos[i];
           if (layerInfo.id === layerID) {
             //we have our desired layerInfo.
             info = layerInfo;
@@ -742,7 +753,7 @@ define([
         return {
           id: layer.id,
           visibility: layer.visible,
-          layerObject: layer
+          layer: layer
         };
       },
 
