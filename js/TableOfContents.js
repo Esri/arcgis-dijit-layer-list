@@ -1,11 +1,10 @@
 /*
 TODO
-  need function that gets layers from webmap response
-  need to test with non webmap map
-  Rename to "LayerList"
-  enableSublayers per each layer info (bool or array of sublayers to show?)
-  settings button node per each layer info
-  custom content node per each layer info
+  Add option to layer info for enabling/disabling sublayers on the layer.
+  Add option to layer info for a node for a button. (appears on title line).
+  Add option to layer info for a content node for custom content (appears below title).
+  Rename widget to "LayerList".
+  Test with webmaps and non webmaps.
 */
 define([
   "dojo/_base/array",
