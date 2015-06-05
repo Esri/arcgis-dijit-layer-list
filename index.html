@@ -63,7 +63,7 @@
     <h2>Change Options</h2>
     <ul class="change-options">
       <li>Theme:
-        <input id="theme_form" type="text" value="LayerList" />
+        <input id="theme_form" type="text" value="esriLayerList" />
       </li>
       <li>Visible:
         <input id="visible_form" type="checkbox" checked />
@@ -182,6 +182,7 @@
 
         /* Demo page events */
         on(dom.byId('theme_form'), 'keyup', lang.hitch(this, function (evt) {
+          console.log(evt.target.value);
           myWidget.set("theme", evt.target.value);
         }));
 
