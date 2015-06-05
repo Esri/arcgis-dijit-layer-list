@@ -47,6 +47,12 @@
       margin: 20px;
       padding: 0;
     }
+    
+    .esriIconSettings2{
+      padding: 10px;
+    }
+    
+    
   </style>
 </head>
 
@@ -136,7 +142,7 @@
         var layers = arcgisUtils.getLegendLayers(response);
 
         // turn off sublayers for a specific layer
-        //layers[1].sublayers = false;
+        // layers[1].subLayers = false;
 
         /* Optionally add settings icon and custom content to first layer */
         var first = layers.length - 1;

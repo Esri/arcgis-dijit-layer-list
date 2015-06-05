@@ -245,10 +245,10 @@ define([
       },
 
       _showSublayers: function (layerInfo) {
-        if (layerInfo.hasOwnProperty("sublayers")) {
-          return layerInfo.sublayers;
+        if (layerInfo.hasOwnProperty("subLayers")) {
+          return layerInfo.subLayers;
         } else {
-          return this.sublayers;
+          return this.subLayers;
         }
       },
 
