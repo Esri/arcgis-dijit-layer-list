@@ -1,7 +1,7 @@
 /*
 TODO
-  Rename widget to "LayerList".
   Test with webmaps and non webmaps.
+  Get function created similar to getLegendLayers();
 */
 define([
   "dojo/_base/array",
@@ -22,7 +22,7 @@ define([
 
   "esri/promiseList",
 
-  "dojo/text!./TableOfContents/templates/TableOfContents.html"
+  "dojo/text!./LayerList/templates/LayerList.html"
 ],
   function (
     array, declare, lang,
@@ -37,7 +37,7 @@ define([
       templateString: dijitTemplate,
 
       options: {
-        theme: "TableOfContents",
+        theme: "esriLayerList",
         map: null,
         layers: null,
         subLayers: true,
@@ -55,19 +55,19 @@ define([
         this.set(defaults);
         // classes
         this.css = {
-          container: "tocContainer",
-          list: "tocList",
-          subList: "tocSubList",
-          subListLayer: "tocSubListLayer",
-          layer: "tocLayer",
-          layerScaleInvisible: "tocScaleInvisible",
-          title: "tocTitle",
-          titleContainer: "tocTitleContainer",
-          checkbox: "tocCheckbox",
-          label: "tocLabel",
-          button: "tocButton",
-          content: "tocContent",
-          clear: "tocClear"
+          container: "esriLayerListContainer",
+          list: "esriLayerListList",
+          subList: "esriLayerListSubList",
+          subListLayer: "esriLayerListSubListLayer",
+          layer: "esriLayerListLayer",
+          layerScaleInvisible: "esriLayerListScaleInvisible",
+          title: "esriLayerListTitle",
+          titleContainer: "esriLayerListTitleContainer",
+          checkbox: "esriLayerListCheckbox",
+          label: "esriLayerListLabel",
+          button: "esriLayerListButton",
+          content: "esriLayerListContent",
+          clear: "esriLayerListClear"
         };
       },
 
@@ -751,8 +751,6 @@ define([
 
       _createLayerInfo: function (layer) {
         return {
-          id: layer.id,
-          visibility: layer.visible,
           layer: layer
         };
       },
