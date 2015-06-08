@@ -37,6 +37,7 @@
   display: block;
   padding: 10px 20px 10px 32px;
   margin: 0;
+  word-wrap: break-word;
 }
 
 .dj_rtl .esriLayerList .esriLayerListLabel {
