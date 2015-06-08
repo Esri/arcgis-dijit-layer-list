@@ -685,8 +685,11 @@ define([
           // get all layers
           for (var i = 0; i < layers.length; i++) {
             var response = layers[i];
-            // create necessary events
-            this._layerEvent(response);
+            // if we have a layer
+            if(response.layer){
+              // create necessary events
+              this._layerEvent(response);
+            }
           }
         }
       },
