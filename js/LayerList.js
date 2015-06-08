@@ -1,8 +1,3 @@
-/*
-TODO
-  Test with webmaps and non webmaps.
-  Get function created similar to getLegendLayers();
-*/
 define([
   "dojo/_base/array",
   "dojo/_base/declare",
