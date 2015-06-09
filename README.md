@@ -68,7 +68,8 @@ This is what the layers array should look like.
 ``` javascript
 layers = [
     {
-        layer: LayerObject // required
+        layer: LayerObject // required unless featureCollection.
+        featureCollection: featureCollection, // required unless layerObject. if the layer is a feature collection, should match AGOL feature collection response and not have a layerObject.
         subLayers: true, // optional
         content: <domNode>, // optional
         button: <domNode>, // optional
