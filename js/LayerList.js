@@ -454,34 +454,6 @@ define([
         this._layerEvents = [];
       },
 
-      // todo
-      _setMapEvents: function () {
-        /*var i;
-        // map events
-        if (this._mapEvents && this._mapEvents.length) {
-          for (i = 0; i < this._mapEvents.length; i++) {
-            this._mapEvents[i].remove();
-          }
-        }
-        this._mapEvents = [];
-        // if we have a map
-        if (this.map) {
-          // event for layer adds
-          var layerAddEvent = on(this.map, "layer-add", lang.hitch(this, function () {
-            this.refresh();
-          }));
-          this.own(layerAddEvent);
-          this._mapEvents.push(layerAddEvent);
-          // event for layer removes
-          var layerRemoveEvent = on(this.map, "layer-remove", lang.hitch(this, function () {
-            this.refresh();
-          }));
-          this.own(layerRemoveEvent);
-          this._mapEvents.push(layerRemoveEvent);
-        }
-        */
-      },
-
       _toggleVisible: function (index, subIndex, visible) {
         // if its a sublayer
         if (subIndex !== null) {
@@ -501,7 +473,7 @@ define([
         });
       },
 
-      // todo 3.0: out of scale range for sublayers
+      // todo: show out of scale range for sublayers
       _layerVisChangeEvent: function (response, featureCollection, subLayerIndex) {
         var layer;
         // layer is a feature collection
@@ -550,9 +522,7 @@ define([
         } else {
           // layer visibility changes
           this._layerVisChangeEvent(response);
-          // todo 3.0: need to figure out way to support togglling map service sublayers outside of widget
-          // todo 3.0: need event for wms sublayer toggles
-          // todo 3.0: need event for KML sublayer toggles
+          // todo: need to figure out way to support visibility change of map service, WMS, & KML sublayers outside of widget
         }
       },
 
@@ -805,7 +775,6 @@ define([
         this._visible();
         this._updateAllMapLayers();
         this.refresh().always(lang.hitch(this, function () {
-          this._setMapEvents();
           this.set("loaded", true);
           this.emit("load", {});
         }));
@@ -831,7 +800,6 @@ define([
         this._set("map", newVal);
         if (this._created) {
           this._mapLoaded(this.map).then(lang.hitch(this, function () {
-            this._setMapEvents();
             this._updateAllMapLayers();
             this.refresh();
           }));
