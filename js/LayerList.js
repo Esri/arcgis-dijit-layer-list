@@ -82,19 +82,9 @@ define([
 
       // start widget. called by user
       startup: function () {
-        if (this.map) {
-          // when map is loaded
-          if (this.map.loaded) {
-            this._init();
-          } else {
-            on.once(this.map, "load", lang.hitch(this, function () {
-              this._init();
-            }));
-          }
-        } else {
+        this._mapLoaded(this.map).then(lang.hitch(this, function () {
           this._init();
-
-        }
+        }));
       },
 
       // connections/subscriptions will be cleaned up during the destroy() lifecycle phase
@@ -148,6 +138,23 @@ define([
       /* ---------------- */
       /* Private Functions */
       /* ---------------- */
+
+      _mapLoaded: function (map) {
+        var def = new Deferred();
+        if (map) {
+          // when map is loaded
+          if (map.loaded) {
+            def.resolve();
+          } else {
+            on.once(map, "load", lang.hitch(this, function () {
+              def.resolve();
+            }));
+          }
+        } else {
+          def.resolve();
+        }
+        return def.promise;
+      },
 
       _layerLoaded: function (layerIndex) {
         var layers = this.layers;
@@ -447,13 +454,32 @@ define([
         this._layerEvents = [];
       },
 
+      // todo
       _setMapEvents: function () {
-        this.own(on(this.map, "layer-add", lang.hitch(this, function () {
-          this.refresh();
-        })));
-        this.own(on(this.map, "layer-remove", lang.hitch(this, function () {
-          this.refresh();
-        })));
+        /*var i;
+        // map events
+        if (this._mapEvents && this._mapEvents.length) {
+          for (i = 0; i < this._mapEvents.length; i++) {
+            this._mapEvents[i].remove();
+          }
+        }
+        this._mapEvents = [];
+        // if we have a map
+        if (this.map) {
+          // event for layer adds
+          var layerAddEvent = on(this.map, "layer-add", lang.hitch(this, function () {
+            this.refresh();
+          }));
+          this.own(layerAddEvent);
+          this._mapEvents.push(layerAddEvent);
+          // event for layer removes
+          var layerRemoveEvent = on(this.map, "layer-remove", lang.hitch(this, function () {
+            this.refresh();
+          }));
+          this.own(layerRemoveEvent);
+          this._mapEvents.push(layerRemoveEvent);
+        }
+        */
       },
 
       _toggleVisible: function (index, subIndex, visible) {
@@ -681,7 +707,7 @@ define([
           for (var i = 0; i < layers.length; i++) {
             var response = layers[i];
             // if we have a layer
-            if(response.layer){
+            if (response.layer) {
               // create necessary events
               this._layerEvent(response);
             }
@@ -754,7 +780,7 @@ define([
       },
 
       _updateAllMapLayers: function () {
-        if (!this.layers || !this.layers.length) {
+        if (this.map && (!this.layers || !this.layers.length)) {
           var layers = [];
           // get all non graphic layers
           array.forEach(this.map.layerIds, function (layerId) {
@@ -804,12 +830,30 @@ define([
       _setMapAttr: function (newVal) {
         this._set("map", newVal);
         if (this._created) {
-          this.refresh();
+          this._mapLoaded(this.map).then(lang.hitch(this, function () {
+            this._setMapEvents();
+            this._updateAllMapLayers();
+            this.refresh();
+          }));
         }
       },
 
       _setLayersAttr: function (newVal) {
         this._set("layers", newVal);
+        if (this._created) {
+          this.refresh();
+        }
+      },
+
+      _setRemoveUnderscoresAttr: function (newVal) {
+        this._set("removeUnderscores", newVal);
+        if (this._created) {
+          this.refresh();
+        }
+      },
+
+      _setSubLayersAttr: function (newVal) {
+        this._set("subLayers", newVal);
         if (this._created) {
           this.refresh();
         }
