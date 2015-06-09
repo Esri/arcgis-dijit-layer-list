@@ -3,7 +3,6 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
 
-  "dojo/Evented",
   "dojo/Deferred",
   "dojo/on",
 
@@ -21,13 +20,13 @@ define([
 ],
   function (
     array, declare, lang,
-    Evented, Deferred, on,
+    Deferred, on,
     domClass, domStyle, domConstruct, domAttr,
     _WidgetBase, _TemplatedMixin,
     promiseList,
     dijitTemplate
   ) {
-    return declare([_WidgetBase, _TemplatedMixin, Evented], {
+    return declare([_WidgetBase, _TemplatedMixin], {
 
       templateString: dijitTemplate,
 
@@ -94,22 +93,8 @@ define([
       },
 
       /* ---------------- */
-      /* Public Events */
-      /* ---------------- */
-      // load
-      // toggle
-
-      /* ---------------- */
       /* Public Functions */
       /* ---------------- */
-
-      show: function () {
-        this.set("visible", true);
-      },
-
-      hide: function () {
-        this.set("visible", false);
-      },
 
       refresh: function () {
         // all layer info
@@ -129,7 +114,7 @@ define([
           this._removeEvents();
           this._createLayerNodes();
           this._setLayerEvents();
-          this.emit("refresh", {});
+          this.emit("refresh");
         }));
         // return promise
         return pL;
@@ -776,7 +761,7 @@ define([
         this._updateAllMapLayers();
         this.refresh().always(lang.hitch(this, function () {
           this.set("loaded", true);
-          this.emit("load", {});
+          this.emit("load");
         }));
       },
 
