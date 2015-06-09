@@ -18,11 +18,11 @@ The LayerList widget provides list of layers that allows the toggling of layer v
 
 ```javascript
 var map = response.map;
-    var layers = arcgisUtils.getLayerList(response);
+    //var layers = arcgisUtils.getLayerList(response);
 
     myWidget = new LayerList({
       map: map,
-      layers: layers
+      //layers: layers
     }, "LayerList");
     myWidget.startup();
 ```
