@@ -11,6 +11,8 @@ define([
   "dojo/dom-construct",
   "dojo/dom-attr",
 
+  "dojo/i18n!./LayerList/nls/LayerList",
+
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
 
@@ -22,6 +24,7 @@ define([
     array, declare, lang,
     Deferred, on,
     domClass, domStyle, domConstruct, domAttr,
+    i18n,
     _WidgetBase, _TemplatedMixin,
     promiseList,
     dijitTemplate
@@ -50,6 +53,8 @@ define([
         // classes
         this.css = {
           container: "esriLayerListContainer",
+          noLayers: "esriLayerListNoLayers",
+          noLayersText: "esriLayerListNoLayersText",
           list: "esriLayerListList",
           subList: "esriLayerListSubList",
           subListLayer: "esriLayerListSubListLayer",
@@ -242,189 +247,196 @@ define([
       _createLayerNodes: function () {
         // clear node
         this._layersNode.innerHTML = "";
+        this._noLayersNode.innerHTML = "";
+        domClass.remove(this._container, this.css.noLayers);
         var loadedLayers = this._loadedLayers;
-        // create nodes for each layer
-        for (var i = 0; i < loadedLayers.length; i++) {
-          var response = loadedLayers[i];
-          if (response) {
-            var layer = response.layer;
-            var layerIndex = response.layerIndex;
-            var layerInfo = response.layerInfo;
-            if (layerInfo) {
-              // set visibility on layer info if not set
-              if (!layerInfo.hasOwnProperty("visibility")) {
-                layerInfo.visibility = layerInfo.layer.visible;
-              }
-              // set layer info id
-              if (!layerInfo.hasOwnProperty("id")) {
-                layerInfo.id = layerInfo.layer.id;
-              }
-              var subLayers;
-              // layer node
-              var layerNode = domConstruct.create("li", {
-                className: this.css.layer
-              });
-              // currently visible layer
-              if (layer && !layer.visibleAtMapScale) {
-                domClass.add(layerNode, this.css.layerScaleInvisible);
-              }
-              domConstruct.place(layerNode, this._layersNode, "first");
-              // title of layer
-              var titleNode = domConstruct.create("div", {
-                className: this.css.title
-              }, layerNode);
-              // nodes for subLayers
-              var subNodes = [];
-              var layerType = layer.declaredClass;
-              // get parent layer checkbox status
-              var status = this._checkboxStatus(layerInfo);
-              // title container
-              var titleContainerNode = domConstruct.create("div", {
-                className: this.css.titleContainer
-              }, titleNode);
-              var id = this.id + "_checkbox_" + layerIndex;
-              // Title checkbox
-              var checkboxNode = domConstruct.create("input", {
-                type: "checkbox",
-                id: id,
-                "data-layer-index": layerIndex,
-                className: this.css.checkbox
-              }, titleContainerNode);
-              domAttr.set(checkboxNode, "checked", status);
-              // optional button icon
-              var buttonNode;
-              if (layerInfo.button) {
-                buttonNode = domConstruct.create("div", {
-                  className: this.css.button
-                }, titleContainerNode);
-                domConstruct.place(layerInfo.button, buttonNode);
-              }
-              // Title text
-              var title = this._getLayerTitle(response);
-              var labelNode = domConstruct.create("label", {
-                className: this.css.label,
-                textContent: title
-              }, titleContainerNode);
-              domAttr.set(labelNode, "for", id);
-              // clear css
-              var clearNode = domConstruct.create("div", {
-                className: this.css.clear
-              }, titleContainerNode);
-              // optional custom content
-              var contentNode;
-              if (layerInfo.content) {
-                contentNode = domConstruct.create("div", {
-                  className: this.css.content
-                }, titleNode);
-                domConstruct.place(layerInfo.content, contentNode);
-              }
-              // lets save all the nodes for events
-              var nodesObj = {
-                checkbox: checkboxNode,
-                title: titleNode,
-                titleContainer: titleContainerNode,
-                label: labelNode,
-                layer: layerNode,
-                clear: clearNode,
-                button: buttonNode,
-                content: contentNode,
-                subNodes: subNodes
-              };
-              this._nodes[layerIndex] = nodesObj;
-              if (layer) {
-                // subLayers from thier info. Also WMS layers
-                subLayers = layer.layerInfos;
-                // KML subLayers
-                if (layerType === "esri.layers.KMLLayer") {
-                  subLayers = layer.folders;
+        if (loadedLayers && loadedLayers.length) {
+          // create nodes for each layer
+          for (var i = 0; i < loadedLayers.length; i++) {
+            var response = loadedLayers[i];
+            if (response) {
+              var layer = response.layer;
+              var layerIndex = response.layerIndex;
+              var layerInfo = response.layerInfo;
+              if (layerInfo) {
+                // set visibility on layer info if not set
+                if (!layerInfo.hasOwnProperty("visibility")) {
+                  layerInfo.visibility = layerInfo.layer.visible;
                 }
-                // if we have more than one subLayer and layer is of valid type for subLayers
-                if (this._showSublayers(layerInfo) && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
-                  // create subLayer list
-                  var subListNode = domConstruct.create("ul", {
-                    className: this.css.subList
-                  }, layerNode);
-                  // create each subLayer item
-                  for (var j = 0; j < subLayers.length; j++) {
-                    // subLayer info
-                    var subLayer = subLayers[j];
-                    var subLayerIndex;
-                    var parentId = -1;
-                    var subSubListNode = null;
-                    // Dynamic Map Service
-                    if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
-                      subLayerIndex = subLayer.id;
-                      parentId = subLayer.parentLayerId;
+                // set layer info id
+                if (!layerInfo.hasOwnProperty("id")) {
+                  layerInfo.id = layerInfo.layer.id;
+                }
+                var subLayers;
+                // layer node
+                var layerNode = domConstruct.create("li", {
+                  className: this.css.layer
+                });
+                // currently visible layer
+                if (layer && !layer.visibleAtMapScale) {
+                  domClass.add(layerNode, this.css.layerScaleInvisible);
+                }
+                domConstruct.place(layerNode, this._layersNode, "first");
+                // title of layer
+                var titleNode = domConstruct.create("div", {
+                  className: this.css.title
+                }, layerNode);
+                // nodes for subLayers
+                var subNodes = [];
+                var layerType = layer.declaredClass;
+                // get parent layer checkbox status
+                var status = this._checkboxStatus(layerInfo);
+                // title container
+                var titleContainerNode = domConstruct.create("div", {
+                  className: this.css.titleContainer
+                }, titleNode);
+                var id = this.id + "_checkbox_" + layerIndex;
+                // Title checkbox
+                var checkboxNode = domConstruct.create("input", {
+                  type: "checkbox",
+                  id: id,
+                  "data-layer-index": layerIndex,
+                  className: this.css.checkbox
+                }, titleContainerNode);
+                domAttr.set(checkboxNode, "checked", status);
+                // optional button icon
+                var buttonNode;
+                if (layerInfo.button) {
+                  buttonNode = domConstruct.create("div", {
+                    className: this.css.button
+                  }, titleContainerNode);
+                  domConstruct.place(layerInfo.button, buttonNode);
+                }
+                // Title text
+                var title = this._getLayerTitle(response);
+                var labelNode = domConstruct.create("label", {
+                  className: this.css.label,
+                  textContent: title
+                }, titleContainerNode);
+                domAttr.set(labelNode, "for", id);
+                // clear css
+                var clearNode = domConstruct.create("div", {
+                  className: this.css.clear
+                }, titleContainerNode);
+                // optional custom content
+                var contentNode;
+                if (layerInfo.content) {
+                  contentNode = domConstruct.create("div", {
+                    className: this.css.content
+                  }, titleNode);
+                  domConstruct.place(layerInfo.content, contentNode);
+                }
+                // lets save all the nodes for events
+                var nodesObj = {
+                  checkbox: checkboxNode,
+                  title: titleNode,
+                  titleContainer: titleContainerNode,
+                  label: labelNode,
+                  layer: layerNode,
+                  clear: clearNode,
+                  button: buttonNode,
+                  content: contentNode,
+                  subNodes: subNodes
+                };
+                this._nodes[layerIndex] = nodesObj;
+                if (layer) {
+                  // subLayers from thier info. Also WMS layers
+                  subLayers = layer.layerInfos;
+                  // KML subLayers
+                  if (layerType === "esri.layers.KMLLayer") {
+                    subLayers = layer.folders;
+                  }
+                  // if we have more than one subLayer and layer is of valid type for subLayers
+                  if (this._showSublayers(layerInfo) && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+                    // create subLayer list
+                    var subListNode = domConstruct.create("ul", {
+                      className: this.css.subList
+                    }, layerNode);
+                    // create each subLayer item
+                    for (var j = 0; j < subLayers.length; j++) {
+                      // subLayer info
+                      var subLayer = subLayers[j];
+                      var subLayerIndex;
+                      var parentId = -1;
+                      var subSubListNode = null;
+                      // Dynamic Map Service
+                      if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
+                        subLayerIndex = subLayer.id;
+                        parentId = subLayer.parentLayerId;
+                      }
+                      // KML
+                      else if (layerType === "esri.layers.KMLLayer") {
+                        subLayerIndex = subLayer.id;
+                        parentId = subLayer.parentFolderId;
+                      }
+                      // WMS
+                      else if (layerType === "esri.layers.WMSLayer") {
+                        subLayerIndex = subLayer.name;
+                        parentId = -1;
+                      }
+                      // place subLayers not in the root
+                      if (parentId !== -1) {
+                        subSubListNode = domConstruct.create("ul", {
+                          className: this.css.subList
+                        }, this._nodes[layerIndex].subNodes[parentId].subLayer);
+                      }
+                      // default checked state
+                      var subChecked = this._subCheckboxStatus(layerInfo, subLayer);
+                      var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
+                      // list item node
+                      var subLayerNode = domConstruct.create("li", {
+                        className: this.css.subListLayer
+                      }, subSubListNode || subListNode);
+                      // title of subLayer layer
+                      var subTitleNode = domConstruct.create("div", {
+                        className: this.css.title
+                      }, subLayerNode);
+                      // subLayer title container
+                      var subTitleContainerNode = domConstruct.create("div", {
+                        className: this.css.titleContainer
+                      }, subTitleNode);
+                      // subLayer checkbox
+                      var subCheckboxNode = domConstruct.create("input", {
+                        type: "checkbox",
+                        id: subId,
+                        "data-layer-index": layerIndex,
+                        "data-sublayer-index": subLayerIndex,
+                        className: this.css.checkbox
+                      }, subTitleContainerNode);
+                      domAttr.set(subCheckboxNode, "checked", subChecked);
+                      // subLayer Title text
+                      var subTitle = subLayer.name || "";
+                      var subLabelNode = domConstruct.create("label", {
+                        className: this.css.label,
+                        textContent: subTitle
+                      }, subTitleContainerNode);
+                      domAttr.set(subLabelNode, "for", subId);
+                      // subLayer clear css
+                      var subClearNode = domConstruct.create("div", {
+                        className: this.css.clear
+                      }, subTitleContainerNode);
+                      // object of subLayer nodes
+                      var subNode = {
+                        subList: subListNode,
+                        subSubList: subSubListNode,
+                        subLayer: subLayerNode,
+                        subTitle: subTitleNode,
+                        subTitleContainer: subTitleContainerNode,
+                        subCheckbox: subCheckboxNode,
+                        subLabel: subLabelNode,
+                        subClear: subClearNode
+                      };
+                      // add node to array
+                      subNodes[subLayerIndex] = subNode;
                     }
-                    // KML
-                    else if (layerType === "esri.layers.KMLLayer") {
-                      subLayerIndex = subLayer.id;
-                      parentId = subLayer.parentFolderId;
-                    }
-                    // WMS
-                    else if (layerType === "esri.layers.WMSLayer") {
-                      subLayerIndex = subLayer.name;
-                      parentId = -1;
-                    }
-                    // place subLayers not in the root
-                    if (parentId !== -1) {
-                      subSubListNode = domConstruct.create("ul", {
-                        className: this.css.subList
-                      }, this._nodes[layerIndex].subNodes[parentId].subLayer);
-                    }
-                    // default checked state
-                    var subChecked = this._subCheckboxStatus(layerInfo, subLayer);
-                    var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
-                    // list item node
-                    var subLayerNode = domConstruct.create("li", {
-                      className: this.css.subListLayer
-                    }, subSubListNode || subListNode);
-                    // title of subLayer layer
-                    var subTitleNode = domConstruct.create("div", {
-                      className: this.css.title
-                    }, subLayerNode);
-                    // subLayer title container
-                    var subTitleContainerNode = domConstruct.create("div", {
-                      className: this.css.titleContainer
-                    }, subTitleNode);
-                    // subLayer checkbox
-                    var subCheckboxNode = domConstruct.create("input", {
-                      type: "checkbox",
-                      id: subId,
-                      "data-layer-index": layerIndex,
-                      "data-sublayer-index": subLayerIndex,
-                      className: this.css.checkbox
-                    }, subTitleContainerNode);
-                    domAttr.set(subCheckboxNode, "checked", subChecked);
-                    // subLayer Title text
-                    var subTitle = subLayer.name || "";
-                    var subLabelNode = domConstruct.create("label", {
-                      className: this.css.label,
-                      textContent: subTitle
-                    }, subTitleContainerNode);
-                    domAttr.set(subLabelNode, "for", subId);
-                    // subLayer clear css
-                    var subClearNode = domConstruct.create("div", {
-                      className: this.css.clear
-                    }, subTitleContainerNode);
-                    // object of subLayer nodes
-                    var subNode = {
-                      subList: subListNode,
-                      subSubList: subSubListNode,
-                      subLayer: subLayerNode,
-                      subTitle: subTitleNode,
-                      subTitleContainer: subTitleContainerNode,
-                      subCheckbox: subCheckboxNode,
-                      subLabel: subLabelNode,
-                      subClear: subClearNode
-                    };
-                    // add node to array
-                    subNodes[subLayerIndex] = subNode;
                   }
                 }
               }
             }
           }
+        } else {
+          domClass.add(this._container, this.css.noLayers);
+          domAttr.set(this._noLayersNode, "textContent", i18n.noLayers);
         }
       },
 

@@ -3,6 +3,19 @@
   border-top: 1px solid #e0e0e0;
 }
 
+.esriLayerList .esriLayerListNoLayers .esriLayerListList {
+  display: none;
+}
+
+.esriLayerList .esriLayerListNoLayersText {
+  display: none;
+}
+
+.esriLayerList .esriLayerListNoLayers .esriLayerListNoLayersText {
+  display: block;
+  padding: 10px;
+}
+
 .esriLayerList .esriLayerListList ul {
   background-color: #d3d3d3;
   background-color: rgba(0, 0, 0, 0.025);
