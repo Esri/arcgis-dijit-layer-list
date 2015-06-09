@@ -55,7 +55,7 @@ LayerList(options, srcNode);
 ### Options (Object)
 |property|required|type|value|description|
 |---|---|---|---|---|
-|theme||string|LayerList|CSS Class for uniquely styling the widget.|
+|theme||string|esriLayerList|CSS Class for uniquely styling the widget.|
 |map|x|Map|null|ArcGIS JS Map|
 |layers|x|Object[]|null|[Operational Layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/) ([Layer Example](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/operationalLayer/02qt00000006000000/))|
 |visible||Boolean|true|Show the widget|
@@ -69,11 +69,11 @@ This is what the layers array should look like.
 layers = [
     {
         layer: LayerObject // required
-        subLayers: true,
-        content: <domNode>,
-        button: <domNode>,
-        visibility: true,
-        id: "my_layer"
+        subLayers: true, // optional
+        content: <domNode>, // optional
+        button: <domNode>, // optional
+        visibility: true, // optional
+        id: "my_layer" // optional
     },
     {
     	...
@@ -97,10 +97,6 @@ layers = [
 startup(): Start the widget.
 ### destroy
 destroy(): Destroy the widget.
-### show
-show(): Show the widget.
-### hide
-hide(): hide the widget.
 ### refresh
 refresh(): reload all layers and properties that may have changed.
 
@@ -108,20 +104,10 @@ refresh(): reload all layers and properties that may have changed.
 ### load
 #### Example
 	on(widget, 'load', function(evt){…})
-#### Event Object
-
-``` javascript
-{}
-```
 
 ### refresh
 #### Example
 	on(widget, 'refresh', function(evt){…})
-#### Event Object
-
-``` javascript
-{}
-```
 
 ### toggle
 #### Example
