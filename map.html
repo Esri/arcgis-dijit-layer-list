@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <title>LayerList Dijit</title>
+  <link rel="stylesheet" type="text/css" href="http://jsdev.arcgis.com/3.14/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="js/LayerList/css/LayerList.css">
+  <style type="text/css">
+    body {
+      margin: 40px;
+      padding: 20px;
+    }
+    
+    .container {
+      position: relative;
+      padding: 10px;
+      border: 1px solid #eee;
+      -webkit-border-radius: 3px;
+      border-radius: 3px;
+    }
+    
+    #map {
+      width: 100%;
+      height: 500px;
+      position: relative;
+    }
+    
+    #LayerListContainer {
+      width: 280px;
+      height: 500px;
+      background: #eee;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 99;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body class="claro">
+  <div class="container">
+    <div id="map" class="map">
+    </div>
+    <div id="LayerListContainer">
+      <div id="LayerList"></div>
+    </div>
+    <p><a href="https://github.com/esri/arcgis-dijit-layer-list">Documentation &amp; Download</a>
+    </p>
+  </div>
+  <script type="text/javascript">
+    var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    var dojoConfig = {
+      //locale: "ar",
+      // The locationPath logic below may look confusing but all its doing is 
+      // enabling us to load the api from a CDN and load local modules from the correct location.
+      packages: [{
+        name: "application",
+        location: package_path + '/js'
+      }]
+    };
+  </script>
+  <script src="http://jsdev.arcgis.com/3.14/" type="text/javascript"></script>
+  <script type="text/javascript">
+    var map, myWidget;
+    require([
+      "dojo/_base/lang",
+      "esri/config",
+      "application/LayerList",
+      "esri/arcgis/utils",
+      "dojo/on",
+      "dojo/dom",
+      "esri/map",
+      "esri/layers/ArcGISDynamicMapServiceLayer",
+      "esri/layers/FeatureLayer",
+      "esri/layers/GeoRSSLayer",
+      "esri/layers/ArcGISTiledMapServiceLayer",
+      "esri/layers/ArcGISImageServiceLayer",
+      "esri/symbols/SimpleFillSymbol",
+     "esri/layers/GraphicsLayer",
+     "esri/geometry/Circle",
+     "esri/graphic"
+    ], function (
+      lang,
+      esriConfig,
+      LayerList,
+      arcgisUtils,
+      on,
+      dom,
+      Map,
+      ArcGISDynamicMapServiceLayer,
+      FeatureLayer,
+      GeoRSSLayer,
+      ArcGISTiledMapServiceLayer,
+      ArcGISImageServiceLayer,
+      SimpleFillSymbol,
+      GraphicsLayer,
+      Circle,
+      Graphic
+    ) {
+
+
+      // RUN DIRECT MAP SERVICE
+      var map = new Map("map", {
+        basemap: "topo",
+        center: [-100.45, 37.75],
+        zoom: 5
+      });
+
+
+      // //Takes a URL to a non cached map service.
+      var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", {
+        "opacity": 0.5,
+        "id": "Census - dynamicMapServiceLayer"
+      });
+      map.addLayer(dynamicMapServiceLayer);
+
+
+      //    //Complex multi-level dyanmic service Only visible when zoomed in very tight.. Naperville Illinois (West Chicago)
+      var complexMultilevelDynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Water_Network/MapServer", {
+        "opacity": 0.5,
+        "id": "Naperville - complexMultilevelDynamicMapServiceLayer"
+      });
+      map.addLayer(complexMultilevelDynamicMapServiceLayer);
+
+
+      //  //Tiled Service
+      var tiled = new ArcGISTiledMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/WorldTimeZones/MapServer");
+      map.addLayer(tiled);
+
+
+      // //Feature Service North of LA
+      var fl = new FeatureLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Energy/Geology/FeatureServer/0", {
+        id: "world-regions",
+        opacity: 0.5
+      });
+      map.addLayer(fl);
+
+
+      // GeoRSS Yellowstone and Sahara areas.
+      var georssUrl = "https://dl.dropboxusercontent.com/u/2654618/data-mixed.xml";
+      var georss = new GeoRSSLayer(georssUrl);
+      georss.on("load", function () {
+        domStyle.set("loading", "display", "none");
+        // create an info template
+
+        // set the info template for the feature layers that make up the GeoRSS layer
+        // the GeoRSS layer contains one feature layer for each geometry type
+        var layers = georss.getFeatureLayers();
+        arrayUtils.forEach(layers, function (l) {
+
+        });
+      });
+      map.addLayer(georss);
+
+
+      //Image Service / Toronto
+      var imageServiceLayer = new ArcGISImageServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Toronto/ImageServer", {
+        opacity: 0.75
+      });
+      map.addLayer(imageServiceLayer);
+
+
+
+      //GRAPHICS Layer on click
+      var symbol = new SimpleFillSymbol().setColor(null).outline.setColor("blue");
+      var gl = new GraphicsLayer({
+        id: "circles"
+      });
+      var geodesic = dom.byId("geodesic");
+      map.addLayer(gl);
+      map.on("click", function (e) {
+        var radius = map.extent.getWidth() / 10;
+        var circle = new Circle({
+          center: e.mapPoint,
+          geodesic: true,
+          radius: radius
+        });
+        var graphic = new Graphic(circle, symbol);
+        gl.add(graphic);
+      });
+
+
+      myWidget = new LayerList({
+        map: map,
+        layers: map._layers
+      }, "LayerList");
+      myWidget.startup();
+      // END RUN DIRECT MAP SERVICE
+
+
+    });
+  </script>
+</body>
+
+</html>

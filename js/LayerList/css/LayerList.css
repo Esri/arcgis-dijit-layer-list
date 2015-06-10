@@ -1,0 +1,104 @@
+.esriLayerList .esriLayerListList {
+  background-color: #ededed;
+  border-top: 1px solid #e0e0e0;
+}
+
+.esriLayerList .esriLayerListNoLayers .esriLayerListList {
+  display: none;
+}
+
+.esriLayerList .esriLayerListNoLayersText {
+  display: none;
+}
+
+.esriLayerList .esriLayerListNoLayers .esriLayerListNoLayersText {
+  display: block;
+  padding: 10px;
+}
+
+.esriLayerList .esriLayerListList ul {
+  background-color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.esriLayerList .esriLayerListList,
+.esriLayerList .esriLayerListLayer,
+.esriLayerList .esriLayerListSubList,
+.esriLayerList .esriLayerListSubListLayer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.esriLayerList .esriLayerListSubList {
+  margin: 0 0 0 12px;
+}
+
+.dj_rtl .esriLayerList .esriLayerListSubList {
+  margin: 0 20px 0 0;
+}
+
+.esriLayerList .esriLayerListTitle {
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 16px;
+  line-height: 20px;
+  background-color: #f8f8f8;
+  color: #555;
+}
+
+.esriLayerList .esriLayerListLabel {
+  display: block;
+  padding: 10px 20px 10px 32px;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.dj_rtl .esriLayerList .esriLayerListLabel {
+  padding: 10px 32px 10px 20px;
+}
+
+.esriLayerList .esriLayerListScaleInvisible .esriLayerListLabel {
+  color: #999;
+}
+
+.esriLayerList .esriLayerListCheckbox {
+  float: left;
+  height: 16px;
+  width: 16px;
+  padding: 0;
+  margin: 12px 5px 12px 10px;
+}
+
+.dj_rtl .esriLayerList .esriLayerListCheckbox {
+  float: right;
+  margin: 12px 10px 12px 5px;
+}
+
+.esriLayerList .esriLayerListButton {
+  float: right;
+  font-size: 16px;
+  line-height: 20px;
+  cursor: pointer;
+  color: #999;
+}
+
+.esriLayerList .esriLayerListButton:hover,
+.esriLayerList .esriLayerListButton:active {
+  color: #333;
+}
+
+.esriLayerList .esriLayerListContent {
+  margin: 0 20px 5px 32px;
+}
+
+.dj_rtl .esriLayerList .esriLayerListContent {
+  margin: 0 32px 5px 20px;
+}
+
+.dj_rtl .esriLayerList .esriLayerListButton {
+  float: left;
+}
+
+.esriLayerList .esriLayerListClear {
+  clear: both;
+}

@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-  <title>TOC Dijit</title>
+  <title>LayerList Dijit</title>
   <link rel="stylesheet" type="text/css" href="http://jsdev.arcgis.com/3.14/esri/css/esri.css">
-  <link rel="stylesheet" type="text/css" href="js/TableOfContents/css/TableOfContents.css">
+  <link rel="stylesheet" type="text/css" href="js/LayerList/css/LayerList.css">
   <style type="text/css">
     body {
       margin: 40px;
@@ -27,11 +27,8 @@
       position: relative;
     }
     
-    .TableOfContents {
+    #LayerListContainer {
       width: 280px;
-    }
-    
-    #tocContainer {
       height: 500px;
       background: #eee;
       position: absolute;
@@ -47,6 +44,12 @@
       margin: 20px;
       padding: 0;
     }
+    
+    .esriIconSettings2{
+      padding: 10px;
+    }
+    
+    
   </style>
 </head>
 
@@ -54,19 +57,19 @@
   <div class="container">
     <div id="map" class="map">
     </div>
-    <div id="tocContainer">
-      <div id="TableOfContents"></div>
+    <div id="LayerListContainer">
+      <div id="LayerList"></div>
     </div>
     <h2>Change Options</h2>
     <ul class="change-options">
       <li>Theme:
-        <input id="theme_form" type="text" value="TableOfContents" />
+        <input id="theme_form" type="text" value="esriLayerList" />
       </li>
       <li>Visible:
         <input id="visible_form" type="checkbox" checked />
       </li>
     </ul>
-    <p><a href="https://github.com/esri/arcgis-dijit-table-of-contents">Documentation &amp; Download</a>
+    <p><a href="https://github.com/esri/arcgis-dijit-layer-list">Documentation &amp; Download</a>
     </p>
   </div>
   <script type="text/javascript">
@@ -87,17 +90,18 @@
     require([
       "dojo/_base/lang",
       "esri/config",
-      "application/TableOfContents",
+      "application/LayerList",
       "esri/arcgis/utils",
       "dojo/on",
-      "dojo/dom"
+      "dojo/dom",
+      "dojo/dom-construct"
     ], function (
       lang,
       esriConfig,
-      TableOfContents,
+      LayerList,
       arcgisUtils,
       on,
-      dom
+      dom, domConstruct
     ) {
 
 
@@ -115,7 +119,7 @@
       // c46382e26f81477ca0046d376b2989fa - georss
 
       // e90e7933b68a43988b04fe800d0330ba - wms
-      
+
       // 72748e2e531f400cbe5a7560f768bdb8 - federal lands
 
       // arcgisUtils.arcgisUrl = "http://kd.mapsdevext.arcgis.com/sharing/rest/content/items";
@@ -132,48 +136,42 @@
       }).then(lang.hitch(this, function (response) {
         map = response.map;
 
+        var layers = arcgisUtils.getLegendLayers(response);
 
-        var layers = response.itemInfo.itemData.operationalLayers;
-
+        // turn off sublayers for a specific layer
+        // layers[1].subLayers = false;
 
         /* Optionally add settings icon and custom content to first layer */
         var first = layers.length - 1;
-        // Add id for custom settings button
-        layers[first].settingsId = "myCustomSettings";
-        // add id for custom content div
-        layers[first].customContentId = "myCustomContent";
+        var firstLayer = layers[first];
+
+        // optional button
+        firstLayer.button = domConstruct.create("div", {
+          className: "esriIcon esriIconSettings2"
+        });
+        on(firstLayer.button, "click", function () {
+          alert("hello world.");
+        });
+
+
+        // custom content
+        firstLayer.content = domConstruct.create("div", {
+          innerHTML: "Here is some custom content."
+        });
+
 
 
         /* Create widget */
-
-        myWidget = new TableOfContents({
+        myWidget = new LayerList({
           map: map,
           layers: layers
-        }, "TableOfContents");
-
+        }, "LayerList");
+        myWidget.startup();
 
 
         /* These are some test events */
-
         on(myWidget, 'load', lang.hitch(this, function (evt) {
           console.log("load", evt);
-        }));
-
-        on(myWidget, 'refresh', lang.hitch(this, function (evt) {
-
-          console.log('refreshed');
-
-          var customInfo = dom.byId("myCustomContent");
-          if (customInfo) {
-            customInfo.innerHTML = "<a href=\"#\">Sign in</a>";
-          }
-
-          var customSettings = dom.byId("myCustomSettings");
-          if (customSettings) {
-            on(customSettings, "click", function () {
-              alert("hello world.");
-            });
-          }
         }));
 
         on(myWidget, 'toggle', lang.hitch(this, function (evt) {
@@ -181,7 +179,10 @@
         }));
 
 
+
+        /* Demo page events */
         on(dom.byId('theme_form'), 'keyup', lang.hitch(this, function (evt) {
+          console.log(evt.target.value);
           myWidget.set("theme", evt.target.value);
         }));
 
@@ -190,7 +191,7 @@
         }));
 
 
-        myWidget.startup();
+
 
 
       }), lang.hitch(this, function (error) {

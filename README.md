@@ -1,31 +1,29 @@
-# TOC Widget
+# LayerList Widget
 
 ## Features
-The TableOfContents widget provides a table of contents that allows the toggling of layer visibility. The style can be completely changed and skinned to match your own map design.
+The LayerList widget provides list of layers that allows the toggling of layer visibility. The style can be completely changed and skinned to match your own map design.
 
 ### Purpose
 - This widget is meant to be simple. It's general purpose is for the end user to toggle layer visibility.
 - A legend isn't included along side each layer. Use the legend widget for displaying information about the layers.
-- There are options to specify a "settingsId" or "customContentId" which will create nodes with these Ids within the widget. These nodes will allow you to do your app's configuration of the layer or put custom content, like a transperency slider, underneath the layer's title.
+- There are options to specify a node for a button and/or custom content. These nodes will allow you to do your app's configuration of the layer or put custom content, like a transperency slider, underneath the layer's title.
 
 ### Known Issues
 - Toggling of Mapservice, KML and WMS sublayers outside of the widget is not supported.
 - Out of scale range for sublayers not supported.
 
-[View it live](http://esri.github.io/arcgis-dijit-table-of-contents/)
+[View it live](http://esri.github.io/arcgis-dijit-layer-list/)
 
 ## Quickstart
 
-Layers need to match the [ArcGIS Webmap JSON Spec](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/Web_map_data/02qt0000000q000000/) for [operational layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/).
-
 ```javascript
 var map = response.map;
-    var layers = response.itemInfo.itemData.operationalLayers;
+    //var layers = arcgisUtils.getLayerList(response);
 
-    myWidget = new TableOfContents({
+    myWidget = new LayerList({
       map: map,
-      layers: layers
-    }, "TableOfContents");
+      //layers: layers
+    }, "LayerList");
     myWidget.startup();
 ```
 
@@ -46,18 +44,18 @@ Set your dojo config to load the module.
 	};
 
 ## Require module
-Include the module for the TOC.
+Include the module for the LayerList.
 
-	require(["application/TableOfContents", ... ], function(TableOfContents, ... ){ ... });
+	require(["application/LayerList", ... ], function(LayerList, ... ){ ... });
 
 ## Constructor
 
-TableOfContents(options, srcNode);
+LayerList(options, srcNode);
 
 ### Options (Object)
 |property|required|type|value|description|
 |---|---|---|---|---|
-|theme||string|TableOfContents|CSS Class for uniquely styling the widget.|
+|theme||string|esriLayerList|CSS Class for uniquely styling the widget.|
 |map|x|Map|null|ArcGIS JS Map|
 |layers|x|Object[]|null|[Operational Layers](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/ArcGIS_map_service_operational_layer/02qt00000018000000/) ([Layer Example](http://resources.arcgis.com/en/help/arcgis-web-map-json/index.html#/operationalLayer/02qt00000006000000/))|
 |visible||Boolean|true|Show the widget|
@@ -65,14 +63,18 @@ TableOfContents(options, srcNode);
 |subLayers||Boolean|true|Show sublayers in the list of layers|
 
 #### Layers Object
-This is what the layers array should look like. It follows the response from a webmap's operational layers.
+This is what the layers array should look like.
 
 ``` javascript
 layers = [
     {
-        layer: LayerObject
-        defaultSymbol: Symbol
-        title: String
+        layer: LayerObject // required unless featureCollection.
+        featureCollection: featureCollection, // required unless layerObject. if the layer is a feature collection, should match AGOL feature collection response and not have a layerObject.
+        subLayers: true, // optional
+        content: <domNode>, // optional
+        button: <domNode>, // optional
+        visibility: true, // optional
+        id: "my_layer" // optional
     },
     {
     	...
@@ -96,10 +98,6 @@ layers = [
 startup(): Start the widget.
 ### destroy
 destroy(): Destroy the widget.
-### show
-show(): Show the widget.
-### hide
-hide(): hide the widget.
 ### refresh
 refresh(): reload all layers and properties that may have changed.
 
@@ -107,20 +105,10 @@ refresh(): reload all layers and properties that may have changed.
 ### load
 #### Example
 	on(widget, 'load', function(evt){…})
-#### Event Object
-
-``` javascript
-{}
-```
 
 ### refresh
 #### Example
 	on(widget, 'refresh', function(evt){…})
-#### Event Object
-
-``` javascript
-{}
-```
 
 ### toggle
 #### Example
@@ -170,7 +158,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [license.txt](https://raw.github.com/Esri/arcgis-dijit-table-of-contents/master/license.txt) file.
+A copy of the license is available in the repository's [license.txt](https://raw.github.com/Esri/arcgis-dijit-layer-list/master/license.txt) file.
 
-[](Esri Tags: ArcGIS JavaScript API Layer TOC Table of Contents Public)
+[](Esri Tags: ArcGIS JavaScript API Layer LayerList Table of Contents Public)
 [](Esri Language: JavaScript)
