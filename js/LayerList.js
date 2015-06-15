@@ -37,7 +37,7 @@ define([
 
       templateString: dijitTemplate,
 
-      options: {
+      defaults: {
         theme: "esriLayerList",
         map: null,
         layers: null,
@@ -47,13 +47,10 @@ define([
       },
 
       // lifecycle: 1
-      constructor: function (options, srcRefNode) {
-        // mix in settings and defaults
-        var defaults = lang.mixin({}, this.options, options);
-        // widget node
-        this.domNode = srcRefNode;
-        // properties
-        this.set(defaults);
+      constructor: function (options) {
+        // mix properties
+        var properties = lang.mixin({}, this.defaults, options);
+        this.set(properties);
         // classes
         this.css = {
           container: "esriLayerListContainer",
@@ -75,6 +72,7 @@ define([
       },
 
       postCreate: function () {
+        this.inherited(arguments);
         var _self = this;
         // when checkbox is clicked
         this.own(on(this._layersNode, "." + this.css.checkbox + ":click", function () {
@@ -90,6 +88,7 @@ define([
 
       // start widget. called by user
       startup: function () {
+        this.inherited(arguments);
         this._mapLoaded(this.map).then(lang.hitch(this, function () {
           this._init();
         }));
@@ -464,18 +463,23 @@ define([
         this._layerEvents = [];
       },
 
+      _emitToggle: function (layerIndex, subLayerIndex, visible) {
+        // emit event
+        this.emit("toggle", {
+          layerIndex: layerIndex,
+          subLayerIndex: subLayerIndex,
+          visible: visible
+        });
+      },
+
       _toggleVisible: function (index, visible) {
         var node = this._nodes[index].checkbox;
         var checked = domAttr.get(node, "checked");
         if (checked !== visible) {
           // update checkbox and layer visibility classes
           domAttr.set(node, "checked", visible);
+          this._emitToggle(index, null, visible);
         }
-        // emit event
-        this.emit("toggle", {
-          layerIndex: index,
-          visible: visible
-        });
       },
 
       // todo: show out of scale range for sublayers
@@ -646,6 +650,8 @@ define([
             newVis = !layerInfo.visible;
             layerInfo.setVisibility(newVis);
           }
+          // emit event
+          this._emitToggle(layerIndex, subLayerIndex, newVis);
         }
       },
 
@@ -799,8 +805,10 @@ define([
       /* stateful properties */
 
       _setThemeAttr: function (newVal) {
-        domClass.remove(this.domNode, this.theme);
-        domClass.add(this.domNode, newVal);
+        if (this.domNode) {
+          domClass.remove(this.domNode, this.theme);
+          domClass.add(this.domNode, newVal);
+        }
         this._set("theme", newVal);
       },
 

@@ -117,6 +117,7 @@ refresh(): reload all layers and properties that may have changed.
 ``` javascript
 {
 	layerIndex: Integer,
+  subLayerIndex: Integer,
 	visible: Boolean
 }
 ```
