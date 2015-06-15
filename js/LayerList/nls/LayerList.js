@@ -1,5 +1,9 @@
 define({
   root: ({
-    "noLayers": "No layers to display."
+    widgets: {
+      layerList: {
+        "noLayers": "No layers to display."
+      }
+    }
   })
 });

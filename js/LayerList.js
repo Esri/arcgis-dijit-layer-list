@@ -3,6 +3,9 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
 
+  "esri/kernel",
+  "dojo/uacss",
+
   "dojo/Deferred",
   "dojo/on",
 
@@ -22,6 +25,7 @@ define([
 ],
   function (
     array, declare, lang,
+    esriNS, has,
     Deferred, on,
     domClass, domStyle, domConstruct, domAttr,
     i18n,
@@ -29,7 +33,7 @@ define([
     promiseList,
     dijitTemplate
   ) {
-    return declare([_WidgetBase, _TemplatedMixin], {
+    var Widget = declare([_WidgetBase, _TemplatedMixin], {
 
       templateString: dijitTemplate,
 
@@ -114,7 +118,7 @@ define([
           }
         }
         // wait for layers to load or fail
-        var pL = new promiseList(promises).always(lang.hitch(this, function (response) {
+        var pL = promiseList(promises).always(lang.hitch(this, function (response) {
           this._loadedLayers = response;
           this._removeEvents();
           this._createLayerNodes();
@@ -259,12 +263,18 @@ define([
               var layerIndex = response.layerIndex;
               var layerInfo = response.layerInfo;
               if (layerInfo) {
+                if (layerInfo.featureCollection && !layerInfo.hasOwnProperty("visibility")) {
+                  var firstLayer = layerInfo.featureCollection.layers[0];
+                  if (firstLayer && firstLayer.layerObject) {
+                    layerInfo.visibility = firstLayer.layerObject.visible;
+                  }
+                }
                 // set visibility on layer info if not set
-                if (!layerInfo.hasOwnProperty("visibility")) {
+                if (layer && !layerInfo.hasOwnProperty("visibility")) {
                   layerInfo.visibility = layerInfo.layer.visible;
                 }
                 // set layer info id
-                if (!layerInfo.hasOwnProperty("id")) {
+                if (layer && !layerInfo.hasOwnProperty("id")) {
                   layerInfo.id = layerInfo.layer.id;
                 }
                 var subLayers;
@@ -283,7 +293,10 @@ define([
                 }, layerNode);
                 // nodes for subLayers
                 var subNodes = [];
-                var layerType = layer.declaredClass;
+                var layerType;
+                if (layer) {
+                  layerType = layer.declaredClass;
+                }
                 // get parent layer checkbox status
                 var status = this._checkboxStatus(layerInfo);
                 // title container
@@ -436,7 +449,7 @@ define([
           }
         } else {
           domClass.add(this._container, this.css.noLayers);
-          domAttr.set(this._noLayersNode, "textContent", i18n.noLayers);
+          domAttr.set(this._noLayersNode, "textContent", i18n.widgets.layerList.noLayers);
         }
       },
 
@@ -524,7 +537,10 @@ define([
           var newVis;
           var layerInfo = this.layers[parseInt(layerIndex, 10)];
           var layer = layerInfo.layer;
-          var layerType = layer.declaredClass;
+          var layerType;
+          if (layer) {
+            layerType = layer.declaredClass;
+          }
           var featureCollection = layerInfo.featureCollection;
           var visibleLayers;
           var i;
@@ -536,7 +552,7 @@ define([
             layerInfo.visibility = newVis;
             // toggle all sub layers
             for (i = 0; i < featureCollection.layers.length; i++) {
-              var fcLayer = featureCollection.layers[i].layer;
+              var fcLayer = featureCollection.layers[i].layerObject;
               // toggle to new visibility
               fcLayer.setVisibility(newVis);
             }
@@ -827,5 +843,8 @@ define([
       }
 
     });
-
+    if (has("extend-esri")) {
+      lang.setObject("dijit.LayerList", Widget, esriNS);
+    }
+    return Widget;
   });
