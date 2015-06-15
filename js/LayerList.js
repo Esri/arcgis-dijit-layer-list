@@ -451,21 +451,16 @@ define([
         this._layerEvents = [];
       },
 
-      _toggleVisible: function (index, subIndex, visible) {
-        // if its a sublayer
-        if (subIndex !== null) {
+      _toggleVisible: function (index, visible) {
+        var node = this._nodes[index].checkbox;
+        var checked = domAttr.get(node, "checked");
+        if (checked !== visible) {
           // update checkbox and layer visibility classes
-          domAttr.set(this._nodes[index].subNodes[subIndex].subCheckbox, "checked", visible);
-        }
-        // parent layer
-        else {
-          // update checkbox and layer visibility classes
-          domAttr.set(this._nodes[index].checkbox, "checked", visible);
+          domAttr.set(node, "checked", visible);
         }
         // emit event
         this.emit("toggle", {
           layerIndex: index,
-          subLayerIndex: subIndex,
           visible: visible
         });
       },
@@ -489,7 +484,7 @@ define([
             this._featureCollectionVisible(response.layerIndex, evt.visible);
           } else {
             // update checkbox and layer visibility classes
-            this._toggleVisible(response.layerIndex, null, evt.visible);
+            this._toggleVisible(response.layerIndex, evt.visible);
           }
         }));
         this._layerEvents.push(visChange);
@@ -662,7 +657,7 @@ define([
         }
         // all are the same
         if (equal) {
-          this._toggleVisible(index, null, visible);
+          this._toggleVisible(index, visible);
         }
       },
 
