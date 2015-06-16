@@ -53,21 +53,21 @@ define([
         this.set(properties);
         // classes
         this.css = {
-          container: "esriLayerListContainer",
-          noLayers: "esriLayerListNoLayers",
-          noLayersText: "esriLayerListNoLayersText",
-          list: "esriLayerListList",
-          subList: "esriLayerListSubList",
-          subListLayer: "esriLayerListSubListLayer",
-          layer: "esriLayerListLayer",
-          layerScaleInvisible: "esriLayerListScaleInvisible",
-          title: "esriLayerListTitle",
-          titleContainer: "esriLayerListTitleContainer",
-          checkbox: "esriLayerListCheckbox",
-          label: "esriLayerListLabel",
-          button: "esriLayerListButton",
-          content: "esriLayerListContent",
-          clear: "esriLayerListClear"
+          container: "esriContainer",
+          noLayers: "esriNoLayers",
+          noLayersText: "esriNoLayersText",
+          list: "esriList",
+          subList: "esriSubList",
+          subListLayer: "esriSubListLayer",
+          layer: "esriLayer",
+          layerScaleInvisible: "esriScaleInvisible",
+          title: "esriTitle",
+          titleContainer: "esriTitleContainer",
+          checkbox: "esriCheckbox",
+          label: "esriLabel",
+          button: "esriButton",
+          content: "esriContent",
+          clear: "esriClear"
         };
       },
 
@@ -89,9 +89,7 @@ define([
       // start widget. called by user
       startup: function () {
         this.inherited(arguments);
-        this._mapLoaded(this.map).then(lang.hitch(this, function () {
-          this._init();
-        }));
+        this._mapLoaded(this.map).then(lang.hitch(this, this._init));
       },
 
       // connections/subscriptions will be cleaned up during the destroy() lifecycle phase
@@ -117,15 +115,13 @@ define([
           }
         }
         // wait for layers to load or fail
-        var pL = promiseList(promises).always(lang.hitch(this, function (response) {
+        return promiseList(promises).always(lang.hitch(this, function (response) {
           this._loadedLayers = response;
           this._removeEvents();
           this._createLayerNodes();
           this._setLayerEvents();
           this.emit("refresh");
         }));
-        // return promise
-        return pL;
       },
 
       /* ---------------- */
@@ -186,24 +182,19 @@ define([
       },
 
       _checkboxStatus: function (layerInfo) {
-        return layerInfo.visibility || false;
+        return !!layerInfo.visibility;
       },
 
       _WMSVisible: function (layerInfo, subLayerInfo) {
-        var checked = false;
         var visibleLayers = [];
         if (layerInfo && layerInfo.layer) {
           visibleLayers = layerInfo.layer.visibleLayers;
         }
-        var found = array.indexOf(visibleLayers, subLayerInfo.name);
-        if (found !== -1) {
-          checked = true;
-        }
-        return checked;
+        return array.indexOf(visibleLayers, subLayerInfo.name) > -1;
       },
 
       _subCheckboxStatus: function (layerInfo, subLayerInfo) {
-        var checked = false;
+        var checked;
         var layerType = layerInfo.layer.declaredClass;
         switch (layerType) {
         case "esri.layers.KMLLayer":
@@ -219,32 +210,27 @@ define([
       },
 
       _getLayerTitle: function (e) {
-        var title = "";
+        var title = "",
+          layer = e.layer,
+          layerInfo = e.layerInfo;
         // get best title
-        if (e.layerInfo && e.layerInfo.title) {
-          title = e.layerInfo.title;
-        } else if (e.layer && e.layer.arcgisProps && e.layer.arcgisProps.title) {
-          title = e.layer.arcgisProps.title;
-        } else if (e.layer && e.layer.name) {
-          title = e.layer.name;
-        } else if (e.layerInfo && e.layerInfo.id) {
-          title = e.layerInfo.id;
-        } else if (e.layer && e.layer.id) {
-          title = e.layer.id;
+        if (layerInfo && layerInfo.title) {
+          title = layerInfo.title;
+        } else if (layer && layer.arcgisProps && layer.arcgisProps.title) {
+          title = layer.arcgisProps.title;
+        } else if (layer && layer.name) {
+          title = layer.name;
+        } else if (layerInfo && layerInfo.id) {
+          title = layerInfo.id;
+        } else if (layer && layer.id) {
+          title = layer.id;
         }
         // optionally remove underscores
-        if (this.removeUnderscores) {
-          title = title.replace(/_/g, " ");
-        }
-        return title;
+        return this.removeUnderscores ? title.replace(/_/g, " ") : title;
       },
 
       _showSublayers: function (layerInfo) {
-        if (layerInfo.hasOwnProperty("subLayers")) {
-          return layerInfo.subLayers;
-        } else {
-          return this.subLayers;
-        }
+        return layerInfo.hasOwnProperty("subLayers") ? layerInfo.subLayers : this.subLayers;
       },
 
       _createLayerNodes: function () {
@@ -453,10 +439,9 @@ define([
       },
 
       _removeEvents: function () {
-        var i;
         // layer visibility events
         if (this._layerEvents && this._layerEvents.length) {
-          for (i = 0; i < this._layerEvents.length; i++) {
+          for (var i = 0; i < this._layerEvents.length; i++) {
             this._layerEvents[i].remove();
           }
         }
@@ -586,32 +571,32 @@ define([
                     }
                   }
                 }
-                //Now that the array of visibleLayer IDs is assembled,
-                //strip off IDs of invisible child layers, and
-                //IDs of group layers (group layer IDs should not be submitted 
+                //Now that the array of visibleLayer Ids is assembled,
+                //strip off Ids of invisible child layers, and
+                //Ids of group layers (group layer Ids should not be submitted 
                 //in .setVisible() or loss of toggle control madness ensues.
                 //Remove layers whos parents are not visible:
-                var no_invisible_parents = [];
+                var noInvisibleParents = [];
                 for (i = 0; i < visibleLayers.length; i++) {
                   var id = visibleLayers[i];
-                  var hasParentsInVisibleArray = this._allIDsPresent(layer, id, visibleLayers);
+                  var hasParentsInVisibleArray = this._allIdsPresent(layer, id, visibleLayers);
                   if (hasParentsInVisibleArray) {
-                    no_invisible_parents.push(id);
+                    noInvisibleParents.push(id);
                   }
                 }
-                var no_groups = [];
-                for (var j = 0; j < no_invisible_parents.length; j++) {
-                  var lyrInfo = this._getLayerInfo(layer, no_invisible_parents[j]);
+                var noGroups = [];
+                for (var j = 0; j < noInvisibleParents.length; j++) {
+                  var lyrInfo = this._getLayerInfo(layer, noInvisibleParents[j]);
                   if (lyrInfo && lyrInfo.subLayerIds === null) {
-                    no_groups.push(no_invisible_parents[j]);
+                    noGroups.push(noInvisibleParents[j]);
                   }
                 }
                 // note: set -1 if array is empty.
-                if (!no_groups.length) {
-                  no_groups = [-1];
+                if (!noGroups.length) {
+                  noGroups = [-1];
                 }
                 // set visible sublayers which are not grouped
-                layer.setVisibleLayers(no_groups);
+                layer.setVisibleLayers(noGroups);
               }
               // KML Layer
               else if (layerType === "esri.layers.KMLLayer") {
@@ -699,23 +684,20 @@ define([
         }
       },
 
-      _allIDsPresent: function (layer, layerID, arrayOfIDs) {
-        //Returns false if any IDs are not present in the supplied array of IDs.
-        var parentIds = this._walkUpLayerIDs(layer, layerID);
-        //If any of the parentIDs are NOT in the arrayOfIDs return false:
-        for (var i = 0; i < parentIds.length; i++) {
-          if (array.indexOf(arrayOfIDs, parentIds[i]) === -1) {
-            return false;
-          }
-        }
-        return true;
+      _allIdsPresent: function (layer, layerId, arrayOfIds) {
+        //Returns false if any Ids are not present in the supplied array of Ids.
+        var parentIds = this._walkUpLayerIds(layer, layerId);
+        //If any of the parentIds are NOT in the arrayOfIds return false:
+        return array.every(parentIds, function (id) {
+          return array.indexOf(arrayOfIds, id) > -1;
+        });
       },
 
-      _walkUpLayerIDs: function (layer, layerID) {
-        //returns array of layerIDs of all parents of layerID
-        var layerInfo = this._getLayerInfo(layer, layerID);
+      _walkUpLayerIds: function (layer, layerId) {
+        //returns array of layerIds of all parents of layerId
+        var layerInfo = this._getLayerInfo(layer, layerId);
         var parentLayerInfo;
-        var parentLayerIDs = [];
+        var parentLayerIds = [];
         if (layerInfo) {
           //If the current layerInfo layerInfo doesn't have a parent,
           //then we're at the top of the hierarchy and should return the result.
@@ -723,21 +705,21 @@ define([
             //A parent exists, save the info and add to the array:
             parentLayerInfo = this._getLayerInfo(layer, layerInfo.parentLayerId);
             if (parentLayerInfo) {
-              parentLayerIDs.push(parentLayerInfo.id);
+              parentLayerIds.push(parentLayerInfo.id);
             }
             //Move up hierarchy: reassign the layerInfo to the parent. Loop.
             layerInfo = parentLayerInfo;
           }
         }
-        return parentLayerIDs;
+        return parentLayerIds;
       },
 
-      _getLayerInfo: function (layer, layerID) {
-        //Get the layerInfo for layerID from the layer:
+      _getLayerInfo: function (layer, layerId) {
+        //Get the layerInfo for layerId from the layer:
         var info;
         for (var i = 0; i < layer.layerInfos.length; i++) {
           var layerInfo = layer.layerInfos[i];
-          if (layerInfo.id === layerID) {
+          if (layerInfo.id === layerId) {
             //we have our desired layerInfo.
             info = layerInfo;
             break;
@@ -747,14 +729,7 @@ define([
       },
 
       _isSupportedLayerType: function (layer) {
-        if (layer) {
-          if (layer._basemapGalleryLayerType && layer._basemapGalleryLayerType === "basemap") {
-            return false;
-          } else {
-            return true;
-          }
-        }
-        return false;
+        return layer && !layer._basemapGalleryLayerType || layer && layer._basemapGalleryLayerType !== "basemap";
       },
 
       _createLayerInfo: function (layer) {

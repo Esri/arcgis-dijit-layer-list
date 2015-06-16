@@ -2,7 +2,7 @@ define({
   root: ({
     widgets: {
       layerList: {
-        "noLayers": "No layers to display."
+        noLayers: "No layers to display."
       }
     }
   })

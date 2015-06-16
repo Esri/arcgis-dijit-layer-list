@@ -1,44 +1,44 @@
-.esriLayerList .esriLayerListList {
+.esriLayerList .esriList {
   background-color: #ededed;
   border-top: 1px solid #e0e0e0;
 }
 
-.esriLayerList .esriLayerListNoLayers .esriLayerListList {
+.esriLayerList .esriNoLayers .esriList {
   display: none;
 }
 
-.esriLayerList .esriLayerListNoLayersText {
+.esriLayerList .esriNoLayersText {
   display: none;
 }
 
-.esriLayerList .esriLayerListNoLayers .esriLayerListNoLayersText {
+.esriLayerList .esriNoLayers .esriNoLayersText {
   display: block;
   padding: 10px;
 }
 
-.esriLayerList .esriLayerListList ul {
+.esriLayerList .esriList ul {
   background-color: #d3d3d3;
   background-color: rgba(0, 0, 0, 0.025);
 }
 
-.esriLayerList .esriLayerListList,
-.esriLayerList .esriLayerListLayer,
-.esriLayerList .esriLayerListSubList,
-.esriLayerList .esriLayerListSubListLayer {
+.esriLayerList .esriList,
+.esriLayerList .esriLayer,
+.esriLayerList .esriSubList,
+.esriLayerList .esriSubListLayer {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.esriLayerList .esriLayerListSubList {
+.esriLayerList .esriSubList {
   margin: 0 0 0 12px;
 }
 
-.dj_rtl .esriLayerList .esriLayerListSubList {
+.dj_rtl .esriLayerList .esriSubList {
   margin: 0 20px 0 0;
 }
 
-.esriLayerList .esriLayerListTitle {
+.esriLayerList .esriTitle {
   border-bottom: 1px solid #e0e0e0;
   font-size: 16px;
   line-height: 20px;
@@ -46,22 +46,22 @@
   color: #555;
 }
 
-.esriLayerList .esriLayerListLabel {
+.esriLayerList .esriLabel {
   display: block;
   padding: 10px 20px 10px 32px;
   margin: 0;
   word-wrap: break-word;
 }
 
-.dj_rtl .esriLayerList .esriLayerListLabel {
+.dj_rtl .esriLayerList .esriLabel {
   padding: 10px 32px 10px 20px;
 }
 
-.esriLayerList .esriLayerListScaleInvisible .esriLayerListLabel {
+.esriLayerList .esriScaleInvisible .esriLabel {
   color: #999;
 }
 
-.esriLayerList .esriLayerListCheckbox {
+.esriLayerList .esriCheckbox {
   float: left;
   height: 16px;
   width: 16px;
@@ -69,12 +69,12 @@
   margin: 12px 5px 12px 10px;
 }
 
-.dj_rtl .esriLayerList .esriLayerListCheckbox {
+.dj_rtl .esriLayerList .esriCheckbox {
   float: right;
   margin: 12px 10px 12px 5px;
 }
 
-.esriLayerList .esriLayerListButton {
+.esriLayerList .esriButton {
   float: right;
   font-size: 16px;
   line-height: 20px;
@@ -82,23 +82,23 @@
   color: #999;
 }
 
-.esriLayerList .esriLayerListButton:hover,
-.esriLayerList .esriLayerListButton:active {
+.esriLayerList .esriButton:hover,
+.esriLayerList .esriButton:active {
   color: #333;
 }
 
-.esriLayerList .esriLayerListContent {
+.esriLayerList .esriContent {
   margin: 0 20px 5px 32px;
 }
 
-.dj_rtl .esriLayerList .esriLayerListContent {
+.dj_rtl .esriLayerList .esriContent {
   margin: 0 32px 5px 20px;
 }
 
-.dj_rtl .esriLayerList .esriLayerListButton {
+.dj_rtl .esriLayerList .esriButton {
   float: left;
 }
 
-.esriLayerList .esriLayerListClear {
+.esriLayerList .esriClear {
   clear: both;
 }
