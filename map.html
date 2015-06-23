@@ -50,6 +50,10 @@
     </div>
     <p><a href="https://github.com/esri/arcgis-dijit-layer-list">Documentation &amp; Download</a>
     </p>
+    <div>
+      <input type='button' value="Add Service" id='addService'>
+    </div>
+
   </div>
   <script type="text/javascript">
     var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
@@ -190,6 +194,16 @@
       }, "LayerList");
       myWidget.startup();
       // END RUN DIRECT MAP SERVICE
+
+    document.getElementById('addService').onclick=function(){
+        var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Energy/Infrastructure/MapServer", {
+          "opacity": 0.5,
+          "id": "AddedLayer"
+        });
+    map.addLayer(dynamicMapServiceLayer);
+      };
+
+
 
 
     });
