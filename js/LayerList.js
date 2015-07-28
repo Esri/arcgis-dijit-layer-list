@@ -520,6 +520,57 @@ define([
         }
       },
 
+      _getVisibleLayers: function (layer, subLayerIndex) {
+        var layerInfos = layer.layerInfos;
+        var i;
+        // array for setting visible layers
+        var visibleLayers = [-1];
+
+        if (typeof subLayerIndex !== "undefined") {
+          var newVis = !layerInfos[subLayerIndex].defaultVisibility;
+          // reverse current visibility of sublayer
+          layerInfos[subLayerIndex].defaultVisibility = newVis;
+        }
+
+        // for each sublayer
+        for (i = 0; i < layerInfos.length; i++) {
+          var info = layerInfos[i];
+          // push to visible layers if it's visible
+          if (info.defaultVisibility) {
+            visibleLayers.push(info.id);
+            var negative = array.lastIndexOf(visibleLayers, -1);
+            if (negative !== -1) {
+              visibleLayers.splice(negative, 1);
+            }
+          }
+        }
+        //Now that the array of visibleLayer Ids is assembled,
+        //strip off Ids of invisible child layers, and
+        //Ids of group layers (group layer Ids should not be submitted 
+        //in .setVisible() or loss of toggle control madness ensues.
+        //Remove layers whos parents are not visible:
+        var noInvisibleParents = [];
+        for (i = 0; i < visibleLayers.length; i++) {
+          var id = visibleLayers[i];
+          var hasParentsInVisibleArray = this._allIdsPresent(layer, id, visibleLayers);
+          if (hasParentsInVisibleArray) {
+            noInvisibleParents.push(id);
+          }
+        }
+        var noGroups = [];
+        for (var j = 0; j < noInvisibleParents.length; j++) {
+          var lyrInfo = this._getLayerInfo(layer, noInvisibleParents[j]);
+          if (lyrInfo && lyrInfo.subLayerIds === null) {
+            noGroups.push(noInvisibleParents[j]);
+          }
+        }
+        // note: set -1 if array is empty.
+        if (!noGroups.length) {
+          noGroups = [-1];
+        }
+        return noGroups;
+      },
+
       _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
         if (this.layers && this.layers.length) {
@@ -553,50 +604,9 @@ define([
               // Map Service Layer
               if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
                 subLayerIndex = parseInt(subLayerIndex, 10);
-                var layerInfos = layer.layerInfos;
-                // array for setting visible layers
-                visibleLayers = [-1];
-                newVis = !layerInfos[subLayerIndex].defaultVisibility;
-                // reverse current visibility of sublayer
-                layerInfos[subLayerIndex].defaultVisibility = newVis;
-                // for each sublayer
-                for (i = 0; i < layerInfos.length; i++) {
-                  var info = layerInfos[i];
-                  // push to visible layers if it's visible
-                  if (info.defaultVisibility) {
-                    visibleLayers.push(info.id);
-                    var negative = array.lastIndexOf(visibleLayers, -1);
-                    if (negative !== -1) {
-                      visibleLayers.splice(negative, 1);
-                    }
-                  }
-                }
-                //Now that the array of visibleLayer Ids is assembled,
-                //strip off Ids of invisible child layers, and
-                //Ids of group layers (group layer Ids should not be submitted 
-                //in .setVisible() or loss of toggle control madness ensues.
-                //Remove layers whos parents are not visible:
-                var noInvisibleParents = [];
-                for (i = 0; i < visibleLayers.length; i++) {
-                  var id = visibleLayers[i];
-                  var hasParentsInVisibleArray = this._allIdsPresent(layer, id, visibleLayers);
-                  if (hasParentsInVisibleArray) {
-                    noInvisibleParents.push(id);
-                  }
-                }
-                var noGroups = [];
-                for (var j = 0; j < noInvisibleParents.length; j++) {
-                  var lyrInfo = this._getLayerInfo(layer, noInvisibleParents[j]);
-                  if (lyrInfo && lyrInfo.subLayerIds === null) {
-                    noGroups.push(noInvisibleParents[j]);
-                  }
-                }
-                // note: set -1 if array is empty.
-                if (!noGroups.length) {
-                  noGroups = [-1];
-                }
+                visibleLayers = this._getVisibleLayers(layer, subLayerIndex);
                 // set visible sublayers which are not grouped
-                layer.setVisibleLayers(noGroups);
+                layer.setVisibleLayers(visibleLayers);
               }
               // KML Layer
               else if (layerType === "esri.layers.KMLLayer") {
@@ -623,6 +633,10 @@ define([
             }
             // parent map layer
             else {
+              if (layerType === "esri.layers.ArcGISDynamicMapServiceLayer") {
+                visibleLayers = this._getVisibleLayers(layer);
+                layer.setVisibleLayers(visibleLayers);
+              }
               // reverse current visibility of parent layer
               newVis = !layer.visible;
               // new visibility of parent layer
