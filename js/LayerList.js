@@ -97,6 +97,7 @@ define([
           // toggle layer visibility
           _self._toggleLayer(data, subData);
         }));
+        this._setMapEvents();
       },
 
       // start widget. called by user
@@ -192,6 +193,23 @@ define([
           def.resolve(evt);
         }
         return def.promise;
+      },
+      
+      _setMapEvents: function() {
+        this.own(on(this.map, "layer-add", lang.hitch(this, function() {
+          this._updateAllMapLayers();
+          this.refresh().always(lang.hitch(this, function() {
+            this.set("loaded", true);
+            this.emit("load");
+          }));
+        })));
+        this.own(on(this.map, "layer-remove", lang.hitch(this, function() {
+          this._updateAllMapLayers();
+          this.refresh().always(lang.hitch(this, function() {
+            this.set("loaded", true);
+            this.emit("load");
+          }));
+        })));
       },
 
       _checkboxStatus: function (layerInfo) {
@@ -904,7 +922,7 @@ define([
       },
 
       _updateAllMapLayers: function () {
-        if (this.map && (!this.layers || !this.layers.length)) {
+        //if (this.map && (!this.layers || !this.layers.length)) {
           var layers = [];
           // get all non graphic layers
           array.forEach(this.map.layerIds, function (layerId) {
@@ -922,7 +940,7 @@ define([
             }
           }, this);
           this._set("layers", layers);
-        }
+       // }
       },
 
       _init: function () {
