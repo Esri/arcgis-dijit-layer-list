@@ -21,6 +21,8 @@ define([
 
   "esri/promiseList",
 
+  "esri/layerUtils",
+
   "dojo/text!./LayerList/templates/LayerList.html"
 ],
   function (
@@ -31,8 +33,10 @@ define([
     i18n,
     _WidgetBase, _TemplatedMixin,
     promiseList,
+    layerUtils,
     dijitTemplate
   ) {
+
     var Widget = declare([_WidgetBase, _TemplatedMixin], {
 
       templateString: dijitTemplate,
@@ -42,6 +46,8 @@ define([
         map: null,
         layers: null,
         subLayers: true,
+        showOpacitySlider: false,
+        showLegend: false,
         removeUnderscores: true,
         visible: true
       },
@@ -56,8 +62,13 @@ define([
           container: "esriContainer",
           noLayers: "esriNoLayers",
           noLayersText: "esriNoLayersText",
+          slider: "esriSlider",
+          legend: "esriLegend",
           list: "esriList",
+          listExpand: "esriListExpand",
+          listVisible: "esriListVisible",
           subList: "esriSubList",
+          hasSubList: "esriHasSubList",
           subListLayer: "esriSubListLayer",
           layer: "esriLayer",
           layerScaleInvisible: "esriScaleInvisible",
@@ -81,6 +92,8 @@ define([
           data = domAttr.get(this, "data-layer-index");
           // subLayer index
           subData = domAttr.get(this, "data-sublayer-index");
+          // expand/collapse if necessary
+          _self._toggleState(data, subData);
           // toggle layer visibility
           _self._toggleLayer(data, subData);
         }));
@@ -233,6 +246,59 @@ define([
         return layerInfo.hasOwnProperty("subLayers") ? layerInfo.subLayers : this.subLayers;
       },
 
+      _opacityChange: function (value) {
+        if (this.layer) {
+          this.layer.setOpacity(value);
+        } else if (this.layers) {
+          for (var i = 0; i < this.layers.length; i++) {
+            if (this.layers[i].layerObject) {
+              this.layers[i].layerObject.setOpacity(value);
+            }
+          }
+        }
+      },
+
+      _legend: function (titleNode, layerInfo) {
+        require(["esri/dijit/Legend"], lang.hitch(this, function (Legend) {
+          var legendInfo = [layerInfo];
+          if (layerInfo && layerInfo.featureCollection && layerInfo.featureCollection.layers) {
+            legendInfo = layerInfo.featureCollection.layers;
+            for (var i = 0; i < legendInfo.length; i++) {
+              legendInfo[i].layer = legendInfo[i].layerObject;
+            }
+          }
+          var legendDiv = domConstruct.create("div", {
+            className: this.css.legend
+          }, titleNode);
+          var legend = new Legend({
+            map: this.map,
+            layerInfos: legendInfo
+          }, domConstruct.create("div"));
+          domConstruct.place(legend.domNode, legendDiv);
+          legend.startup();
+        }));
+      },
+
+      _slider: function (titleNode, layer, layers, opacity) {
+        require(["dijit/form/HorizontalSlider"], lang.hitch(this, function (HorizontalSlider) {
+          var sliderDiv = domConstruct.create("div", {
+            className: this.css.slider
+          }, titleNode);
+          var slider = new HorizontalSlider({
+            showButtons: false,
+            minimum: 0.1,
+            maximum: 1,
+            layer: layer,
+            layers: layers,
+            discreteValues: 0.1,
+            value: opacity,
+            onChange: this._opacityChange
+          }, domConstruct.create("div"));
+          domConstruct.place(slider.domNode, sliderDiv);
+          slider.startup();
+        }));
+      },
+
       _createLayerNodes: function () {
         // clear node
         this._layersNode.innerHTML = "";
@@ -316,6 +382,21 @@ define([
                 var clearNode = domConstruct.create("div", {
                   className: this.css.clear
                 }, titleContainerNode);
+                // opacity slider
+                if (layerInfo.hasOwnProperty("showOpacitySlider") ? layerInfo.showOpacitySlider : this.showOpacitySlider) {
+                  var layers, opacity;
+                  if (!layer && layerInfo.featureCollection) {
+                    layers = layerInfo.featureCollection.layers;
+                    opacity = layerInfo.featureCollection.layers[0].opacity;
+                  } else {
+                    opacity = layer.opacity;
+                  }
+                  this._slider(titleNode, layer, layers, opacity);
+                }
+                // legend
+                if (layerInfo.hasOwnProperty("showLegend") ? layerInfo.showLegend : this.showLegend) {
+                  this._legend(titleNode, layerInfo);
+                }
                 // optional custom content
                 var contentNode;
                 if (layerInfo.content) {
@@ -337,6 +418,7 @@ define([
                   subNodes: subNodes
                 };
                 this._nodes[layerIndex] = nodesObj;
+                domClass.toggle(layerNode, this.css.listVisible, status);
                 if (layer) {
                   // subLayers from thier info. Also WMS layers
                   subLayers = layer.layerInfos;
@@ -346,10 +428,14 @@ define([
                   }
                   // if we have more than one subLayer and layer is of valid type for subLayers
                   if (this._showSublayers(layerInfo) && layerType !== "esri.layers.ArcGISTiledMapServiceLayer" && subLayers && subLayers.length) {
+                    domClass.add(layerNode, this.css.hasSubList);
+                    domClass.toggle(layerNode, this.css.listExpand, status);
                     // create subLayer list
                     var subListNode = domConstruct.create("ul", {
                       className: this.css.subList
                     }, layerNode);
+                    var oneSubLayerOn;
+                    var subSubLists = [];
                     // create each subLayer item
                     for (var j = 0; j < subLayers.length; j++) {
                       // subLayer info
@@ -374,12 +460,24 @@ define([
                       }
                       // place subLayers not in the root
                       if (parentId !== -1) {
-                        subSubListNode = domConstruct.create("ul", {
-                          className: this.css.subList
-                        }, this._nodes[layerIndex].subNodes[parentId].subLayer);
+                        var parent = this._nodes[layerIndex].subNodes[parentId];
+                        if (subSubLists[parentId]) {
+                          subSubListNode = subSubLists[parentId];
+                        } else {
+                          var parentLayer = parent.subLayer;
+                          subSubListNode = domConstruct.create("ul", {
+                            className: this.css.subList
+                          }, parentLayer);
+                          domClass.add(parentLayer, this.css.hasSubList);
+                          domClass.toggle(parentLayer, [this.css.listVisible, this.css.listExpand], subChecked);
+                          subSubLists[parentId] = subSubListNode;
+                        }
                       }
                       // default checked state
                       var subChecked = this._subCheckboxStatus(layerInfo, subLayer);
+                      if (subChecked && !oneSubLayerOn) {
+                        oneSubLayerOn = true;
+                      }
                       var subId = this.id + "_checkbox_sub_" + layerIndex + "_" + subLayerIndex;
                       // list item node
                       var subLayerNode = domConstruct.create("li", {
@@ -403,7 +501,7 @@ define([
                       }, subTitleContainerNode);
                       domAttr.set(subCheckboxNode, "checked", subChecked);
                       // subLayer Title text
-                      var subTitle = subLayer.name || "";
+                      var subTitle = subLayer.title || subLayer.name || "";
                       var subLabelNode = domConstruct.create("label", {
                         className: this.css.label,
                         textContent: subTitle
@@ -459,7 +557,11 @@ define([
 
       _toggleVisible: function (index, visible) {
         var node = this._nodes[index].checkbox;
+        domClass.toggle(this._nodes[index].layer, this.css.listVisible, visible);
         var checked = domAttr.get(node, "checked");
+        if (domClass.contains(this._nodes[index].layer, this.css.hasSubList)) {
+          domClass.toggle(this._nodes[index].layer, this.css.listExpand, checked);
+        }
         if (checked !== visible) {
           // update checkbox and layer visibility classes
           domAttr.set(node, "checked", visible);
@@ -467,7 +569,6 @@ define([
         }
       },
 
-      // todo: show out of scale range for sublayers
       _layerVisChangeEvent: function (response, featureCollection, subLayerIndex) {
         var layer;
         // layer is a feature collection
@@ -497,7 +598,37 @@ define([
             domClass.toggle(this._nodes[response.layerIndex].layer, this.css.layerScaleInvisible, !visible);
           }));
           this._layerEvents.push(scaleVisChange);
+          // show out of scale range for sublayers if its a map service
+          if (layer.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer") {
+            // on map LOD change
+            var zoomChange = on(this.map, "zoom-end", lang.hitch(this, function () {
+              // gray out invisible sublayers
+              this._subLayerScale(response);
+            }));
+            this._layerEvents.push(zoomChange);
+            // gray out invisible sublayers
+            this._subLayerScale(response);
+          }
         }
+      },
+
+      // gray out invisible sublayers
+      _subLayerScale: function (response) {
+        var layer = response.layer;
+        var dynLayerInfos = layer.createDynamicLayerInfosFromLayerInfos();
+        var layersInScale = layerUtils._getLayersForScale(this.map.getScale(), dynLayerInfos);
+        array.forEach(dynLayerInfos, lang.hitch(this, function (layerInfo) {
+          if (!layerInfo.subLayerIds) { // skip group layers
+            var subLayerId = layerInfo.id;
+            var subLayerNode = this._nodes[response.layerIndex].subNodes[subLayerId].subLayer;
+            var scaleInvisible = false;
+            // if visible and in scale
+            if (array.indexOf(layersInScale, subLayerId) === -1) {
+              scaleInvisible = true;
+            }
+            domClass.toggle(subLayerNode, this.css.layerScaleInvisible, scaleInvisible);
+          }
+        }));
       },
 
       _layerEvent: function (response) {
@@ -571,11 +702,31 @@ define([
         return noGroups;
       },
 
+      _toggleState: function (layerIndex, subLayerIndex) {
+        var layerNode, checkboxNode;
+        layerIndex = parseInt(layerIndex, 10);
+        var layerNodes = this._nodes[layerIndex];
+        if (subLayerIndex !== null) {
+          subLayerIndex = parseInt(subLayerIndex, 10);
+          layerNode = layerNodes.subNodes[subLayerIndex].subLayer;
+          checkboxNode = layerNodes.subNodes[subLayerIndex].subCheckbox;
+        } else {
+          layerNode = layerNodes.layer;
+          checkboxNode = layerNodes.checkbox;
+        }
+        var status = domAttr.get(checkboxNode, "checked");
+        if (domClass.contains(layerNode, this.css.hasSubList)) {
+          domClass.toggle(layerNode, this.css.listExpand, status);
+        }
+        domClass.toggle(layerNode, this.css.listVisible, status);
+      },
+
       _toggleLayer: function (layerIndex, subLayerIndex) {
         // all layers
         if (this.layers && this.layers.length) {
           var newVis;
-          var layerInfo = this.layers[parseInt(layerIndex, 10)];
+          layerIndex = parseInt(layerIndex, 10);
+          var layerInfo = this.layers[layerIndex];
           var layer = layerInfo.layer;
           var layerType;
           if (layer) {
@@ -827,6 +978,20 @@ define([
 
       _setSubLayersAttr: function (newVal) {
         this._set("subLayers", newVal);
+        if (this._created) {
+          this.refresh();
+        }
+      },
+
+      _setShowOpacitySliderAttr: function (newVal) {
+        this._set("showOpacitySlider", newVal);
+        if (this._created) {
+          this.refresh();
+        }
+      },
+
+      _setShowLegendAttr: function (newVal) {
+        this._set("showLegend", newVal);
         if (this._created) {
           this.refresh();
         }

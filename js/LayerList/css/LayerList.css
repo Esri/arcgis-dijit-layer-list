@@ -16,11 +16,6 @@
   padding: 10px;
 }
 
-.esriLayerList .esriList ul {
-  background-color: #d3d3d3;
-  background-color: rgba(0, 0, 0, 0.025);
-}
-
 .esriLayerList .esriList,
 .esriLayerList .esriLayer,
 .esriLayerList .esriSubList,
@@ -32,10 +27,38 @@
 
 .esriLayerList .esriSubList {
   margin: 0 0 0 12px;
+  display: none;
 }
 
 .dj_rtl .esriLayerList .esriSubList {
   margin: 0 20px 0 0;
+}
+
+.esriLayerList .esriListExpand > .esriSubList {
+  display: block;
+}
+
+.esriLayerList .esriLegend {
+  padding: 0 20px;
+  display: none;
+}
+
+.esriLayerList .esriLegend .esriLegendService > table,
+.esriLayerList .esriLegend .esriLegendMsg {
+  display: none;
+}
+
+.esriLayerList .esriListVisible .esriLegend {
+  display: block;
+}
+
+.esriLayerList .esriSlider {
+  padding: 5px 20px 15px 20px;
+  display: none;
+}
+
+.esriLayerList .esriListVisible .esriSlider {
+  display: block;
 }
 
 .esriLayerList .esriTitle {
@@ -44,6 +67,15 @@
   line-height: 20px;
   background-color: #f8f8f8;
   color: #555;
+}
+
+.esriLayerList .esriSubList .esriTitle {
+  border-left: 1px solid #e0e0e0;
+}
+
+.dj_rtl .esriLayerList .esriSubList .esriTitle {
+  border-left: 0;
+  border-right: 1px solid #e0e0e0;
 }
 
 .esriLayerList .esriLabel {

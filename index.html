@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
   <title>LayerList Dijit</title>
   <link rel="stylesheet" type="text/css" href="http://jsdev.arcgis.com/3.14/esri/css/esri.css">
+  <link rel="stylesheet" href="/git/arcgis-js-api/dijit/themes/claro/claro.css">
   <link rel="stylesheet" type="text/css" href="js/LayerList/css/LayerList.css">
   <style type="text/css">
     body {
@@ -67,6 +68,12 @@
       </li>
       <li>Visible:
         <input id="visible_form" type="checkbox" checked />
+      </li>
+      <li>Show Legend:
+        <input id="show_legend" type="checkbox" />
+      </li>
+      <li>Show Opacity Slider:
+        <input id="show_opacity_slider" type="checkbox" />
       </li>
     </ul>
     <p><a href="https://github.com/esri/arcgis-dijit-layer-list">Documentation &amp; Download</a>
@@ -190,7 +197,13 @@
           myWidget.set("visible", evt.target.checked);
         }));
 
+        on(dom.byId('show_legend'), 'change', lang.hitch(this, function (evt) {
+          myWidget.set("showLegend", evt.target.checked);
+        }));
 
+        on(dom.byId('show_opacity_slider'), 'change', lang.hitch(this, function (evt) {
+          myWidget.set("showOpacitySlider", evt.target.checked);
+        }));
 
 
 
